@@ -1,0 +1,233 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+    </data>
+
+    <!--background is transparent so it get he activity background-->
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@android:color/transparent"
+            tools:context=".ui.home.HomeFragment">
+
+            <!--app logo-->
+            <ImageView
+                android:id="@+id/home_fragment_ivAppLogo"
+                android:layout_width="@dimen/_101sdp"
+                android:layout_height="@dimen/_56sdp"
+                android:layout_marginTop="@dimen/_20sdp"
+                android:padding="@dimen/_5sdp"
+                android:src="@drawable/cloud_coin_logo"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/home_fragment_tvVerion"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/_10sdp"
+                android:fontFamily="@font/gotham_light"
+
+                android:textColor="@color/white"
+                android:textSize="12sp"
+                app:layout_constraintEnd_toEndOf="@+id/home_fragment_ivAppLogo"
+                app:layout_constraintStart_toStartOf="@+id/home_fragment_ivAppLogo"
+                app:layout_constraintTop_toBottomOf="@+id/home_fragment_ivAppLogo" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/fragment_home_rvIndicator"
+                android:layout_width="wrap_content"
+                android:layout_height="@dimen/_20sdp"
+                android:layout_marginTop="44dp"
+                android:nestedScrollingEnabled="false"
+                android:orientation="horizontal"
+                android:overScrollMode="never"
+                android:scrollbars="none"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                app:layout_constraintBottom_toTopOf="@+id/home_fragment_tvPrice"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/home_fragment_tvVerion"
+                tools:listitem="@layout/item_indicator" />
+
+
+            <!--price text-->
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="16dp"
+                android:orientation="horizontal"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/fragment_home_rvIndicator">
+
+                <ImageView
+                    android:id="@+id/fragment_withdraw_ivRaidaLogo"
+                    android:layout_width="@dimen/_40sdp"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/ic_raida" />
+                <!--price symbol-->
+                <ImageView
+                    android:visibility="gone"
+                    android:id="@+id/home_fragment_refresh"
+                    android:layout_width="@dimen/_12sdp"
+                    android:layout_height="@dimen/_12sdp"
+                    android:layout_marginStart="@dimen/_5sdp"
+                    android:src="@drawable/ic_refresh" />
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/home_fragment_tvPrice"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="44dp"
+                android:fontFamily="@font/gotham_medium"
+                android:text="0"
+                android:textColor="@color/white"
+                android:textSize="50sp"
+                app:layout_constraintEnd_toEndOf="@+id/fragment_home_rvIndicator"
+                app:layout_constraintStart_toStartOf="@+id/fragment_home_rvIndicator"
+                app:layout_constraintTop_toBottomOf="@+id/fragment_home_rvIndicator" />
+
+            <ImageView
+                android:layout_width="@dimen/_20sdp"
+                android:layout_height="@dimen/_20sdp"
+                android:layout_marginStart="@dimen/_3sdp"
+                android:src="@drawable/ic_price_symbol"
+                app:layout_constraintBottom_toBottomOf="@+id/home_fragment_tvPrice"
+                app:layout_constraintStart_toEndOf="@+id/home_fragment_tvPrice"
+                app:layout_constraintTop_toTopOf="@+id/home_fragment_tvPrice"
+                app:layout_constraintVertical_bias="0.100000024" />
+
+
+            <!--recycler view for price-->
+            <!--<androidx.recyclerview.widget.RecyclerView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/_40sdp"
+                android:orientation="horizontal"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/home_activity_tvPrice"
+                tools:listitem="@layout/item_coin_value" />-->
+
+            <!--in place of recycler view this is use for now..-->
+
+            <!-- cash withdraw layout
+            chain bonding with deposit layout-->
+
+
+            <!--cash deposit layout
+            chain bonding with withdraw layout-->
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/fragment_home_rvDenomination"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/_40sdp"
+                android:layout_marginBottom="@dimen/_15sdp"
+                android:scrollbars="none"
+                app:layout_constraintBottom_toTopOf="@+id/home_fragment_llWithdraw"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/home_fragment_tvPrice"
+                app:layout_constraintVertical_bias="0.469">
+
+
+            </androidx.recyclerview.widget.RecyclerView>
+
+            <LinearLayout
+                android:id="@+id/home_fragment_llWithdraw"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/_110sdp"
+                android:layout_margin="@dimen/_10sdp"
+                android:layout_marginBottom="12dp"
+                android:background="@drawable/design_box_background"
+                android:gravity="center"
+                android:orientation="vertical"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/home_fragment_llDeposit"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toStartOf="parent">
+
+                <ImageView
+                    android:layout_width="@dimen/_22sdp"
+                    android:layout_height="@dimen/_22sdp"
+                    android:src="@drawable/ic_circle_subtract" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/_10sdp"
+                    android:fontFamily="@font/gotham_medium"
+                    android:gravity="center"
+                    android:text="@string/label_withdraw"
+                    android:textAllCaps="true"
+                    android:textColor="@color/colorLightBlue"
+                    android:textSize="@dimen/_16sdp" />
+
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/home_fragment_llDeposit"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/_110sdp"
+                android:layout_margin="@dimen/_10sdp"
+                android:background="@drawable/design_box_background"
+                android:gravity="center"
+                android:orientation="vertical"
+                app:layout_constraintBottom_toBottomOf="@+id/home_fragment_llWithdraw"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toEndOf="@+id/home_fragment_llWithdraw"
+                app:layout_constraintTop_toTopOf="@+id/home_fragment_llWithdraw">
+
+                <ImageView
+                    android:layout_width="@dimen/_22sdp"
+                    android:layout_height="@dimen/_22sdp"
+                    android:src="@drawable/ic_circle_add" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/_10sdp"
+                    android:fontFamily="@font/gotham_medium"
+                    android:gravity="center"
+                    android:text="@string/label_deposit"
+                    android:textAllCaps="true"
+                    android:textColor="@color/colorLightBlue"
+                    android:textSize="@dimen/_16sdp" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/fragment_home_llProgress"
+                android:layout_width="match_parent"
+                android:layout_height="800dp"
+                android:background="@color/colorLightBlackOverlay"
+                android:visibility="gone">
+
+                <ProgressBar
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:indeterminateTint="@color/colorLightBlue" />
+            </LinearLayout>
+
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </ScrollView>
+</layout>

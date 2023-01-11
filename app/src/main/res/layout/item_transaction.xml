@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/_60sdp"
+        android:background="@android:color/transparent">
+
+        <!--image pointer-->
+        <ImageView
+            android:id="@+id/item_transaction_ivPointer"
+            android:layout_width="@dimen/_15sdp"
+            android:layout_height="@dimen/_8sdp"
+            android:layout_marginStart="8dp"
+            android:src="@drawable/ic_green_up"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <!--item status-->
+        <TextView
+            android:id="@+id/item_transaction_tvHeader"
+            android:layout_width="@dimen/_190sdp"
+            android:layout_height="0dp"
+            android:maxLines="2"
+            android:ellipsize="end"
+            android:layout_marginStart="@dimen/_15sdp"
+            android:fontFamily="@font/gotham_medium"
+            android:gravity="start|bottom"
+            android:text="No Memo"
+            android:textColor="@color/white"
+            android:textSize="16sp"
+            app:layout_constraintBottom_toTopOf="@+id/item_transaction_llDateTime"
+            app:layout_constraintStart_toEndOf="@+id/item_transaction_ivPointer"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.49" />
+
+        <!--layout contain date details-->
+        <LinearLayout
+            android:id="@+id/item_transaction_llDateTime"
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:orientation="horizontal"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="@+id/item_transaction_tvHeader"
+            app:layout_constraintTop_toBottomOf="@+id/item_transaction_tvHeader">
+
+            <TextView
+                android:id="@+id/item_transaction_tvDate"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/_2sdp"
+                android:text="JAN 16 `20 8.40AM"
+                android:textColor="@color/colorDarkBlue"
+                android:textSize="12sp" />
+
+        </LinearLayout>
+
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layout_constraintBottom_toBottomOf="@+id/item_transaction_tvHeader"
+            app:layout_constraintEnd_toEndOf="parent"
+           >
+
+            <TextView
+                android:id="@+id/item_transaction_tvAmount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/gotham_medium"
+                android:gravity="center|bottom"
+
+                android:textColor="@color/colorGreen"
+                android:textSize="18sp" />
+
+            <ImageView
+                android:id="@+id/item_transaction_ivPriceSymbol"
+                android:layout_width="@dimen/_10sdp"
+                android:layout_height="@dimen/_10sdp"
+                android:layout_gravity="center"
+                android:layout_marginEnd="@dimen/_5sdp"
+                />
+
+        </LinearLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

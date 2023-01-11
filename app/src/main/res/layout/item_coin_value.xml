@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+
+    </data>
+
+
+
+        <LinearLayout
+            android:layout_width="@dimen/_50sdp"
+            android:layout_height="@dimen/_75sdp"
+            android:padding="@dimen/_5sdp"
+            android:layout_margin="@dimen/_5sdp"
+            android:background="@drawable/design_coin_value_gradient"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/item_coin_tvValue"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/gotham_bold"
+                android:gravity="center"
+                android:text="0"
+                android:textStyle="bold"
+                android:textColor="#c5c8d4"
+                android:textSize="@dimen/_18sdp" />
+
+            <TextView
+                android:id="@+id/item_coin_value_tvDenomination"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/_8sdp"
+                android:gravity="center"
+                android:text="1's"
+                android:fontFamily="@font/gotham_light"
+                android:textColor="@color/colorLightBlue"
+                android:textSize="@dimen/_14sdp" />
+
+        </LinearLayout>
+
+
+
+
+</layout>
