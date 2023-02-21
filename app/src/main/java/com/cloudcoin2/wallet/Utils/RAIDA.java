@@ -42,10 +42,14 @@ import javax.crypto.spec.SecretKeySpec;
 
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
+
 /**
- * The RAIDA class implements the RAIDA version 2.0 protocol and implements the following services -
- * Echo, Detect, Pown, Get Ticket, Fix Fracked, Fix Lost and can generate Request headers compatible
- * with any RAIDA2 protocol service, and parse any RAIDA2 responses to extract status codes and
+ * The RAIDA class implements the RAIDA version 2.0 protocol and implements the
+ * following services -
+ * Echo, Detect, Pown, Get Ticket, Fix Fracked, Fix Lost and can generate
+ * Request headers compatible
+ * with any RAIDA2 protocol service, and parse any RAIDA2 responses to extract
+ * status codes and
  * other metadata.
  *
  * Coded by Partha Dasgupta - last updated May 2022
@@ -64,35 +68,32 @@ public class RAIDA {
     private static final int MAX_RETRIES = 3; // try maximum 3 times in case packets are lost
 
     private static final String[] hosts = {
-            "https://guardian0.chelgu.cz/host.txt",
-            "https://raida-guardian-tx.us/host.txt",
-            "https://g2.cloudcoin.asia/host.txt",
-            "https://guardian.ladyjade.cc/host.txt",
-            "https://watchdog.guardwatch.cc/host.txt",
-            "https://g5.raida-guardian.us/host.txt",
-            "https://goodguardian.xyz/host.txt",
-            "https://g7.ga7.nl/host.txt",
-            "https://raidaguardian.nz/host.txt",
-            "https://g9.guardian9.net/host.txt",
-            "https://g10.guardian25.com/host.txt",
-            "https://g11.raidacash.com/host.txt",
-            "https://g12.aeroflightcb300.com/host.txt",
-            "https://g13.stomarket.co/host.txt",
-            "https://guardian14.gsxcover.com/host.txt",
-            "https://guardian.keilagd.cc/host.txt",
-            "https://g16.guardianstl.us/host.txt",
-            "https://raida-guardian.net/host.txt",
-            "https://g18.raidaguardian.al/host.txt",
-            "https://g19.paolobui.com/host.txt",
-            "https://g20.cloudcoins.asia/host.txt",
-            "https://guardian21.guardian.al/host.txt",
-            "https://rg.encrypting.us/host.txt",
-            "https://g23.cuvar.net/host.txt",
-            "https://guardian24.rsxcover.com/host.txt",
-            "https://g25.mattyd.click/host.txt",
-            "https://g26.cloudcoinconsortium.art/host.txt"
+            "https://g0.chelgu.cz/coin4.txt",
+            "https://g1.raida-guardian-tx.us/coin4.txt",
+            "https://cloudcoin.asia/coin4.txt",
+            "https://ladyjade.cc/coin4.txt",
+            "https://guardwatch.cc/coin4.txt",
+            "https://g5.raida-guardian.cx/coin4.txt",
+            "https://g6.goodguardian.xyz/coin4.txt",
+            "https://ga7.nl/coin4.txt",
+            "https://g8.raidaguardian.nz/coin4.txt",
+            "https://mattyd.click/coin4.txt",
+            "https://guardian25.com/coin4.txt",
+            "https://raidacash.com/coin4.txt",
+            "https://aeroflightcb300.com/coin4.txt",
+            "https://cloudcoinconsortium.art/coin4.txt",
+            "https://g14.gsxcover.com/coin4.txt",
+            "https://newprojects.space/coin4.txt",
+            "https://guardianscloud.xyz/coin4.txt",
+            "https://g17.raida-guardian.net/coin4.txt",
+            "https://raidaguardian.al/coin4.txt",
+            "https://newprojects.tech/coin4.txt",
+            "https://cloudcoins.asia/coin4.txt",
+            "https://guardian.al/coin4.txt",
+            "https://encrypting.us/coin4.txt",
+            "https://cuvar.net/coin4.txt",
+            "https://g24.rsxcover.com/coin4.txt"
     };
-
 
     private static final String[] COMMANDS = {
             "POWN",
@@ -144,7 +145,6 @@ public class RAIDA {
     private int numFixableCoins = 0;
     private boolean ticketing = false;
 
-
     public RAIDA() {
         if (raida != null)
             throw new RuntimeException("Use getinstance to get an instance of the class");
@@ -189,13 +189,15 @@ public class RAIDA {
 
     public static byte[][][] splitSerials(byte[][] arrayToSplit, int chunkSize) {
         if (chunkSize <= 0) {
-            return null;  // just in case :)
+            return null; // just in case :)
         }
         // first we have to check if the array can be split in multiple
         // arrays of equal 'chunk' size
-        int rest = arrayToSplit.length % chunkSize;  // if rest>0 then our last array will have less elements than the others
+        int rest = arrayToSplit.length % chunkSize; // if rest>0 then our last array will have less elements than the
+                                                    // others
         // then we check in how many arrays we can split our input array
-        int chunks = arrayToSplit.length / chunkSize + (rest > 0 ? 1 : 0); // we may have to add an additional array for the 'rest'
+        int chunks = arrayToSplit.length / chunkSize + (rest > 0 ? 1 : 0); // we may have to add an additional array for
+                                                                           // the 'rest'
         // now we know how many arrays we need and create our result array
         byte[][][] arrays = new byte[chunks][][];
         // we create our resulting arrays by copying the corresponding
@@ -208,20 +210,23 @@ public class RAIDA {
         }
         if (rest > 0) { // only when we have a rest
             // we copy the remaining elements into the last chunk
-            arrays[chunks - 1] = Arrays.copyOfRange(arrayToSplit, (chunks - 1) * chunkSize, (chunks - 1) * chunkSize + rest);
+            arrays[chunks - 1] = Arrays.copyOfRange(arrayToSplit, (chunks - 1) * chunkSize,
+                    (chunks - 1) * chunkSize + rest);
         }
         return arrays; // that's it
     }
 
     public static byte[][][][] splitANorPAN(byte[][][] arrayToSplit, int chunkSize) {
         if (chunkSize <= 0) {
-            return null;  // just in case :)
+            return null; // just in case :)
         }
         // first we have to check if the array can be split in multiple
         // arrays of equal 'chunk' size
-        int rest = arrayToSplit.length % chunkSize;  // if rest>0 then our last array will have less elements than the others
+        int rest = arrayToSplit.length % chunkSize; // if rest>0 then our last array will have less elements than the
+                                                    // others
         // then we check in how many arrays we can split our input array
-        int chunks = arrayToSplit.length / chunkSize + (rest > 0 ? 1 : 0); // we may have to add an additional array for the 'rest'
+        int chunks = arrayToSplit.length / chunkSize + (rest > 0 ? 1 : 0); // we may have to add an additional array for
+                                                                           // the 'rest'
         // now we know how many arrays we need and create our result array
         byte[][][][] arrays = new byte[chunks][][][];
         // we create our resulting arrays by copying the corresponding
@@ -234,7 +239,8 @@ public class RAIDA {
         }
         if (rest > 0) { // only when we have a rest
             // we copy the remaining elements into the last chunk
-            arrays[chunks - 1] = Arrays.copyOfRange(arrayToSplit, (chunks - 1) * chunkSize, (chunks - 1) * chunkSize + rest);
+            arrays[chunks - 1] = Arrays.copyOfRange(arrayToSplit, (chunks - 1) * chunkSize,
+                    (chunks - 1) * chunkSize + rest);
         }
         return arrays; // that's it
     }
@@ -261,13 +267,13 @@ public class RAIDA {
             InputStream in = connection.getInputStream();
             BufferedReader reader = new BufferedReader(new InputStreamReader(in));
             StringBuilder html = new StringBuilder();
-            for (String line; (line = reader.readLine()) != null; ) {
+            for (String line; (line = reader.readLine()) != null;) {
                 html.append(line).append("/n");
             }
             in.close();
 
             // String rawdata = html.substring(0, html.length() - 2);
-            //Log.d("servertext", rawdata);
+            // Log.d("servertext", rawdata);
             String serverList = html.toString();
             if (serverList.length() == 0) {
                 Log.e("RAIDA", "Unable to retrieve server list from: " + url + ", trying again with another");
@@ -285,10 +291,10 @@ public class RAIDA {
         if (rawdata != null) {
             String[] parts = rawdata.split("# Mirrors");
             String part1 = parts[0]; // 004
-            //Log.d("URL", part1);
+            // Log.d("URL", part1);
             String[] servers = part1.split("Primary RAIDA");
             String serverList = servers[1];
-            //Log.d("serverList", serverList);
+            // Log.d("serverList", serverList);
             String[] data = serverList.split("/n");
             int length = data.length;
             raidaLists = new ArrayList<RaidaItems>();
@@ -296,12 +302,15 @@ public class RAIDA {
                 String details = data[i];
                 String[] splitdata = details.split(" ");
                 String[] finaldata = splitdata[0].split(":");
-                String address =finaldata[0];
+                String address = finaldata[0];
                 int port = Integer.parseInt(finaldata[1]);
 
-                //uncomment next two lines to simulate a raida (in this case raida 5) being down
-                /*if(i==6)
-                    address="127.0.0.1";*/
+                // uncomment next two lines to simulate a raida (in this case raida 5) being
+                // down
+                /*
+                 * if(i==6)
+                 * address="127.0.0.1";
+                 */
                 RaidaItems raidaItems = new RaidaItems(address, port);
 
                 raidaLists.add(raidaItems);
@@ -319,25 +328,23 @@ public class RAIDA {
     }
 
     public byte[] generateHeader(int raidaID, int type, int udpnum, byte udpChecksum, boolean encryption, byte[] nonce,
-                                 byte[] mSerialNo) {
+            byte[] mSerialNo) {
         byte[] udpHeader = new byte[22];
-        byte[] serialNo = {(byte) 0, (byte) 0, (byte) 0};
+        byte[] serialNo = { (byte) 0, (byte) 0, (byte) 0 };
         if (nonce == null) {
-            nonce = new byte[]{(byte) 0, (byte) 0, (byte) 0};
+            nonce = new byte[] { (byte) 0, (byte) 0, (byte) 0 };
         }
         byte mEnc = (byte) 0;
 
         if (udpnum < 1)
             udpnum = 1;
 
-        byte[] size= new byte[2];
+        byte[] size = new byte[2];
         size[0] = (byte) ((udpnum >> 8) & 0xFF);
         size[1] = (byte) (udpnum & 0xFF);
 
-
-
         byte coinType = 1;
-        if(type==30 || type == 31)
+        if (type == 30 || type == 31)
             coinType = 0;
 
         Log.d("HEADER", "UDP NUM:" + udpnum);
@@ -390,41 +397,39 @@ public class RAIDA {
         return generateHeader(raidaID, type, udpnum, udpChecksum, false, null, null);
     }
 
-    private void makeTCPCall(UDPCall udp)
-    {
-
+    private void makeTCPCall(UDPCall udp) {
 
         // final Handler handler = new Handler();
         Thread thread = new Thread(new Runnable() {
             @Override
             public void run() {
-                //Log.d("size", String.valueOf(raidaLists.size()));
+                // Log.d("size", String.valueOf(raidaLists.size()));
 
-                Log.d("TCP RAIDA " + udp.getIndex(), "Running CMD:" + COMMANDS[udp.getCommandCode()] + " ON Server:" + raidaLists.get(udp.getIndex()).getServerAddress());
+                Log.d("TCP RAIDA " + udp.getIndex(), "Running CMD:" + COMMANDS[udp.getCommandCode()] + " ON Server:"
+                        + raidaLists.get(udp.getIndex()).getServerAddress());
                 Log.d("TCP RAIDA " + udp.getIndex(), "Request: " + bytesToHex(udp.getData()));
-                //System.out.println(raidaLists.get(i).getPorts());
+                // System.out.println(raidaLists.get(i).getPorts());
 
-                Socket sendChannel= null;
+                Socket sendChannel = null;
                 try {
-                    sendChannel = new Socket(raidaLists.get(udp.getIndex()).getServerAddress(), raidaLists.get(udp.getIndex()).getPorts());
-                    OutputStream writer=sendChannel.getOutputStream();
+                    sendChannel = new Socket(raidaLists.get(udp.getIndex()).getServerAddress(),
+                            raidaLists.get(udp.getIndex()).getPorts());
+                    OutputStream writer = sendChannel.getOutputStream();
                     BufferedOutputStream bufferedWriter = new BufferedOutputStream(writer);
                     byte[] fullData = udp.getData();
                     byte[] buffer = new byte[1024];
-
 
                     bufferedWriter.write(fullData, 0, fullData.length);
                     // Flush the data in the socket to the server
                     bufferedWriter.flush();
 
-
-
-                    InputStream reader=sendChannel.getInputStream();
-                    byte[] realData =new byte[500];
-                    int countBytesRead=reader.read(realData);
+                    InputStream reader = sendChannel.getInputStream();
+                    byte[] realData = new byte[500];
+                    int countBytesRead = reader.read(realData);
                     RaidaResponse response = new RaidaResponse(realData, udp.getCommandCode());
 
-                    Log.d("RAIDA " + response.getRaidaId(), "Response to CMD " + COMMANDS[udp.getCommandCode()] + ": " + bytesToHex(realData));
+                    Log.d("RAIDA " + response.getRaidaId(),
+                            "Response to CMD " + COMMANDS[udp.getCommandCode()] + ": " + bytesToHex(realData));
                     handleResponse(response, realData, udp.getCommandCode());
 
                 } catch (Exception e) {
@@ -434,7 +439,6 @@ public class RAIDA {
             }
         });
         thread.start();
-
 
     }
 
@@ -451,11 +455,12 @@ public class RAIDA {
         Thread thread = new Thread(new Runnable() {
             @Override
             public void run() {
-                //Log.d("size", String.valueOf(raidaLists.size()));
+                // Log.d("size", String.valueOf(raidaLists.size()));
 
-                Log.d("RAIDA " + udp.getIndex(), "Running CMD:" + COMMANDS[udp.getCommandCode()] + " ON Server:" + raidaLists.get(udp.getIndex()).getServerAddress());
+                Log.d("RAIDA " + udp.getIndex(), "Running CMD:" + COMMANDS[udp.getCommandCode()] + " ON Server:"
+                        + raidaLists.get(udp.getIndex()).getServerAddress());
                 Log.d("RAIDA " + udp.getIndex(), "Request: " + bytesToHex(udp.getData()));
-                //System.out.println(raidaLists.get(i).getPorts());
+                // System.out.println(raidaLists.get(i).getPorts());
                 DatagramSocket ds = null;
                 try {
                     InetAddress address;
@@ -469,24 +474,25 @@ public class RAIDA {
                     } else {
                         address = serverAddr;
                     }
-                    dp = new DatagramPacket(udp.getData(), udp.getData().length, address, raidaLists.get(udp.getIndex()).getPorts());
+                    dp = new DatagramPacket(udp.getData(), udp.getData().length, address,
+                            raidaLists.get(udp.getIndex()).getPorts());
                     ds.send(dp);
                     ds.setSoTimeout(UDP_CONNECTION_TIMEOUT);
 
                     if (!ignore) {
 
-                        Log.d("RAIDA"+ udp.getIndex(),"Attempt #0 to get response to CMD:"+COMMANDS[udp.getCommandCode()]);
+                        Log.d("RAIDA" + udp.getIndex(),
+                                "Attempt #0 to get response to CMD:" + COMMANDS[udp.getCommandCode()]);
                         try {
 
-                                getUDPResponse(dp,udp,ds,0);
-                        }
-                        catch (Exception e) {
+                            getUDPResponse(dp, udp, ds, 0);
+                        } catch (Exception e) {
                             e.printStackTrace();
                             ds.close();
                             handleResponseError(e, udp);
                         }
 
-                    //System.out.println(bytesToHex(lMsg));
+                        // System.out.println(bytesToHex(lMsg));
 
                     }
                 } catch (IOException e) {
@@ -499,8 +505,7 @@ public class RAIDA {
         thread.start();
     }
 
-    private void getUDPResponse(DatagramPacket dp, UDPCall udp, DatagramSocket ds, int retry) throws Exception
-    {
+    private void getUDPResponse(DatagramPacket dp, UDPCall udp, DatagramSocket ds, int retry) throws Exception {
         try {
             byte[] lMsg = new byte[500];
 
@@ -511,24 +516,20 @@ public class RAIDA {
             realData = dp.getData();
 
             RaidaResponse response = new RaidaResponse(realData, udp.getCommandCode());
-            Log.d("RAIDA " + response.getRaidaId(), "Response to CMD " + COMMANDS[udp.getCommandCode()] + ": " + bytesToHex(realData));
+            Log.d("RAIDA " + response.getRaidaId(),
+                    "Response to CMD " + COMMANDS[udp.getCommandCode()] + ": " + bytesToHex(realData));
             ds.close();
 
             handleResponse(response, realData, udp.getCommandCode());
-        }
-        catch (SocketTimeoutException e) {
+        } catch (SocketTimeoutException e) {
 
-
-            if(retry<2)
-            {
+            if (retry < 2) {
                 retry++;
-                Log.d("RAIDA"+ udp.getIndex(),"Socket time out exception, trying to receive again #"+receiveRetry);
+                Log.d("RAIDA" + udp.getIndex(), "Socket time out exception, trying to receive again #" + receiveRetry);
                 Thread.sleep(100);
-                getUDPResponse(dp,udp,ds,retry);
-            }
-            else
-            {
-                Log.d("RAIDA"+ udp.getIndex(),"Socket time out exception even after max retries, giving up for now");
+                getUDPResponse(dp, udp, ds, retry);
+            } else {
+                Log.d("RAIDA" + udp.getIndex(), "Socket time out exception even after max retries, giving up for now");
                 e.printStackTrace();
                 ds.close();
                 handleResponseError(e, udp);
@@ -539,14 +540,14 @@ public class RAIDA {
     }
 
     private void handleResponseError(Exception e, UDPCall udp) {
-        Log.d("RAIDA"+udp.getIndex() ,"Going to error callback with command code "+udp.getCommandCode());
-        udpCallbacks.ReportBackError(e, udp.getData(),  udp.getCommandCode(),udp.getIndex());
+        Log.d("RAIDA" + udp.getIndex(), "Going to error callback with command code " + udp.getCommandCode());
+        udpCallbacks.ReportBackError(e, udp.getData(), udp.getCommandCode(), udp.getIndex());
     }
 
     private void handleResponse(RaidaResponse response, byte[] lMsg, int commandCode) throws Exception {
 
         String hex = bytesToHex(lMsg);
-        byte[] statusBytes = {response.getStatus()};
+        byte[] statusBytes = { response.getStatus() };
         String status = bytesToHex(statusBytes);
         if (status.equals("1F") && retry < MAX_RETRIES) {
             Log.e("RAIDA" + response.getRaidaId(), "Packet is lost or re-ordered, need to resend UDP packet");
@@ -554,7 +555,7 @@ public class RAIDA {
             // need to resend everything
             replayUDPCalls();
         } else {
-            if(!ticketing || commandCode == 11 ) {
+            if (!ticketing || commandCode == 11) {
                 raidaResponses.add(response);
                 Log.d("raidaresponse count for " + String.valueOf(commandCode), String.valueOf(raidaResponses.size()));
             }
@@ -571,7 +572,7 @@ public class RAIDA {
                     break;
             }
 
-            Log.d("RAIDA" + response.getRaidaId(), "Going to callback with command code "+commandCode);
+            Log.d("RAIDA" + response.getRaidaId(), "Going to callback with command code " + commandCode);
             udpCallbacks.ReportBack(lMsg, hex, commandCode, response.getRaidaId(), mPassCount);
         }
     }
@@ -586,7 +587,7 @@ public class RAIDA {
     }
 
     private void handleTicketResponse(byte[] lMsg, String hex, RaidaResponse response) {
-        byte[] statusBytes = {response.getStatus()};
+        byte[] statusBytes = { response.getStatus() };
         String status = bytesToHex(statusBytes);
         int raidaId = response.getRaidaId();
         Log.d("RAIDA " + raidaId, "Status:" + status);
@@ -594,14 +595,12 @@ public class RAIDA {
         if (masterTicket != null && masterTicket.length == 4) {
             Log.d("RAIDA " + raidaId, "Master Ticket:" + bytesToHex(masterTicket));
 
-
         }
 
     }
 
-
     private void handleFixResponse(byte[] lMsg, String hex, RaidaResponse response) {
-        byte[] statusBytes = {response.getStatus()};
+        byte[] statusBytes = { response.getStatus() };
         String status = bytesToHex(statusBytes);
         int raidaId = response.getRaidaId();
         HashMap<String, byte[]> pans = proposedPans.get(raidaId);
@@ -635,7 +634,6 @@ public class RAIDA {
                     // 0 0 0 0 0 0 1 1
                     // 1 0 0 0 0 0 0 0
 
-
                     // now we need to know which bit contains the value for this byte
                     int bitIndex = i % 8;
                     Log.d("RAIDA " + response.getRaidaId(), "response body:" + bytesToHex(responseBody));
@@ -645,11 +643,11 @@ public class RAIDA {
                     int testBitValue = isBitSet(responseBody[byteIndex], bitIndex) ? 1 : 0;
                     Log.d("RAIDA " + response.getRaidaId(), "bit index: " + bitIndex + " has value" + testBitValue);
 
-
-//                    for (int j = 0; j < 8; j++) {
-//                        int testBitValue = isBitSet(responseBody[byteIndex], j) ? 1 : 0;
-//                        Log.d("RAIDA " + response.getRaidaId(), "bit index: " + j + " has value" + testBitValue);
-//                    }
+                    // for (int j = 0; j < 8; j++) {
+                    // int testBitValue = isBitSet(responseBody[byteIndex], j) ? 1 : 0;
+                    // Log.d("RAIDA " + response.getRaidaId(), "bit index: " + j + " has value" +
+                    // testBitValue);
+                    // }
 
                     // if this bit is set, then pass, else fail
                     int bitValue = isBitSet(responseBody[byteIndex], bitIndex) ? 1 : 0;
@@ -670,26 +668,20 @@ public class RAIDA {
 
         }
 
-
     }
 
-
-
     private void handleCoinResponse(byte[] lMsg, String hex, RaidaResponse response, int commandCode) {
-        byte[] statusBytes = {response.getStatus()};
+        byte[] statusBytes = { response.getStatus() };
         String status = bytesToHex(statusBytes);
         int raidaId = response.getRaidaId();
         Log.d("RAIDA " + raidaId, "Status:" + status);
 
-
         for (int i = 0; i < cloudCoins.size(); i++) {
-            if(commandCode == 1)
-               try {
-                   cloudCoins.get(i).copyAnsToPans();
-               }
-                catch ( Exception e)
-                {
-                    Log.e("RAIDA","Exception while copying ans to pans :"+e.getMessage());
+            if (commandCode == 1)
+                try {
+                    cloudCoins.get(i).copyAnsToPans();
+                } catch (Exception e) {
+                    Log.e("RAIDA", "Exception while copying ans to pans :" + e.getMessage());
                 }
             cloudCoins.get(i).setPownResponse(response.getResponseBody());
 
@@ -712,10 +704,8 @@ public class RAIDA {
                     // 0 0 0 0 0 0 1 1
                     // 1 0 0 0 0 0 0 0
 
-
                     // now we need to know which bit contains the value for this byte
                     int bitIndex = i % 8;
-
 
                     Log.d("RAIDA " + response.getRaidaId(), "coin serial:" + bytesToHex(cloudCoins.get(i).getSerial()));
                     Log.d("RAIDA " + response.getRaidaId(), "byte index:" + byteIndex);
@@ -723,11 +713,11 @@ public class RAIDA {
                     int testBitValue = isBitSet(responseBody[byteIndex], bitIndex) ? 1 : 0;
                     Log.d("RAIDA " + response.getRaidaId(), "bit index: " + bitIndex + " has value" + testBitValue);
 
-
-//                    for (int j = 0; j < 8; j++) {
-//                        int testBitValue = isBitSet(responseBody[byteIndex], bitIndex) ? 1 : 0;
-//                        Log.d("RAIDA " + response.getRaidaId(), "bit index:" + j + " has value" + testBitValue);
-//                    }
+                    // for (int j = 0; j < 8; j++) {
+                    // int testBitValue = isBitSet(responseBody[byteIndex], bitIndex) ? 1 : 0;
+                    // Log.d("RAIDA " + response.getRaidaId(), "bit index:" + j + " has value" +
+                    // testBitValue);
+                    // }
 
                     // if this bit is set, then pass, else fail
                     int bitValue = isBitSet(responseBody[byteIndex], bitIndex) ? 1 : 0;
@@ -738,7 +728,6 @@ public class RAIDA {
                     cloudCoins.get(i).setPownStatus(raidaId, -1);
                     break;
             }
-
 
         }
 
@@ -753,13 +742,13 @@ public class RAIDA {
         byte[] checksumTotal = generateCRC32(challenge);
         byte[] checksum = new byte[4];
         System.arraycopy(checksumTotal, checksumTotal.length - 4, checksum, 0, 4);
-        //Log.d("CRC32 4 bytes:",bytesToHex(checksum));
+        // Log.d("CRC32 4 bytes:",bytesToHex(checksum));
 
-        //Log.d("RANDOM SIZE", challenge.length+"");
-        //Log.d("CHECKSUM SIZE", checksum.length+"");
+        // Log.d("RANDOM SIZE", challenge.length+"");
+        // Log.d("CHECKSUM SIZE", checksum.length+"");
         byte[] mData = new byte[challenge.length + checksum.length];
-        //Log.d("CHALLENGE SIZE", mData.length+"");
-        //Log.d("FIRST", bytesToHex(challenge));
+        // Log.d("CHALLENGE SIZE", mData.length+"");
+        // Log.d("FIRST", bytesToHex(challenge));
         ByteBuffer buff = ByteBuffer.wrap(mData);
         buff.put(challenge);
         buff.put(checksum);
@@ -772,7 +761,6 @@ public class RAIDA {
         buffer.putLong(x);
         return buffer.array();
     }
-
 
     private byte[] generateCRC32(byte[] data) {
         CRC32 crc = new CRC32();
@@ -802,8 +790,8 @@ public class RAIDA {
 
     public byte[] generateRandom(int length, String seed) {
         String AB = "0123456789ABCDEF";
-//        if(seed!=null)
-//            Log.d("Seed:",seed);
+        // if(seed!=null)
+        // Log.d("Seed:",seed);
 
         if (debug) {
             if (seed == null || seed.equals("41414141414141414141414141414141")) {
@@ -821,22 +809,19 @@ public class RAIDA {
         byte[] bytes = pan.getBytes(StandardCharsets.UTF_8);
         byte[] returnBytes = new byte[length];
         System.arraycopy(bytes, 0, returnBytes, 0, length);
-        //Log.d("RandomX:",bytesToHex(returnBytes));
+        // Log.d("RandomX:",bytesToHex(returnBytes));
         return returnBytes;
     }
-    public List<CloudCoin> fixDebugCoins(List<CloudCoin>coins)
-    {
+
+    public List<CloudCoin> fixDebugCoins(List<CloudCoin> coins) {
         return fixDebugCoins(coins, null);
     }
 
-    public List<CloudCoin> fixDebugCoins(List<CloudCoin>coins, String seed)
-    {
-        byte[] pan = generateRandom(16,seed);
-        for(int i=0;i<coins.size();i++)
-        {
-            for(int index=0; index<25;index++)
-            {
-                coins.get(i).setAn(index,pan);
+    public List<CloudCoin> fixDebugCoins(List<CloudCoin> coins, String seed) {
+        byte[] pan = generateRandom(16, seed);
+        for (int i = 0; i < coins.size(); i++) {
+            for (int index = 0; index < 25; index++) {
+                coins.get(i).setAn(index, pan);
             }
 
         }
@@ -846,7 +831,6 @@ public class RAIDA {
     public byte[] generateRandom(int length) {
         return generateRandom(length, null);
     }
-
 
     public void echo() throws Exception {
         ticketing = false;
@@ -891,7 +875,7 @@ public class RAIDA {
         Log.d("HEADER", "Total Coins:" + mSerialno.length + ", max coins:" + MAX_FIX
                 + ", udp num:" + udpNum);
 
-        //maximum 64 packets in 1 request
+        // maximum 64 packets in 1 request
         if (udpNum > MAX_PACKETS) {
             int numRequests = (int) Math.ceil((double) udpNum / (double) MAX_PACKETS);
             for (int i = 0; i < numRequests; i++) {
@@ -912,7 +896,6 @@ public class RAIDA {
             byte[][][][] pgs = null;
             List<byte[]> allChallenges = new ArrayList<byte[]>();
 
-
             int totalBodySize = 0;
             byte[] footer = new BigInteger(SEPERATOR, 2).toByteArray();
             List<byte[]> allBody = new ArrayList<byte[]>();
@@ -920,21 +903,22 @@ public class RAIDA {
             List<byte[]> allNonce = new ArrayList<byte[]>();
             HashMap<String, byte[]> pans = new HashMap<String, byte[]>();
 
-
             if (serials != null) {
                 for (int k = 0; k < serials.length; k++) {
 
                     byte[][] serialChunk = serials[k];
                     byte[] challenge = generateChallenge();
 
-                    // 4 bytes x 25 raidas master ticket = 100 bytes, 3 bytes for each coin, 16 bytes PG
+                    // 4 bytes x 25 raidas master ticket = 100 bytes, 3 bytes for each coin, 16
+                    // bytes PG
                     int totalBodyLength = 100 + (3 * serialChunk.length) + 16;
 
-
-                    // if first packet, then also include the 16 byte  challenge in length
+                    // if first packet, then also include the 16 byte challenge in length
                     if (k == 0) {
-                       // Log.d("RAIDA" + raidaId, "Body size without challenge and footer= " + serialChunk.length + " x 3 + 100 + 16 =" + totalBodyLength);
-                        // Log.d("RAIDA" + raidaId, "Body size with challenge=" + totalBodyLength + "+" + challenge.length);
+                        // Log.d("RAIDA" + raidaId, "Body size without challenge and footer= " +
+                        // serialChunk.length + " x 3 + 100 + 16 =" + totalBodyLength);
+                        // Log.d("RAIDA" + raidaId, "Body size with challenge=" + totalBodyLength + "+"
+                        // + challenge.length);
 
                         totalBodyLength += challenge.length;
                     }
@@ -947,7 +931,7 @@ public class RAIDA {
                     // if first packet, add the challenge
                     if (k == 0) {
                         buff.put(challenge);
-                        //Log.d("RAIDA " + raidaId, "FULL CHALLENGE:" + bytesToHex(challenge));
+                        // Log.d("RAIDA " + raidaId, "FULL CHALLENGE:" + bytesToHex(challenge));
                     }
                     // for fix PG use true random or it gives error
                     boolean oldFlag = this.debug;
@@ -957,12 +941,12 @@ public class RAIDA {
                     this.debug = oldFlag;
 
                     for (int j = 0; j < serialChunk.length; j++) {
-                       // Log.d("RAIDA " + raidaId, "SERIAL:" + bytesToHex(serialChunk[j]));
-                       // Log.d("RAIDA " + raidaId, "PG:" + bytesToHex(pg));
-                        //copy serial to body
+                        // Log.d("RAIDA " + raidaId, "SERIAL:" + bytesToHex(serialChunk[j]));
+                        // Log.d("RAIDA " + raidaId, "PG:" + bytesToHex(pg));
+                        // copy serial to body
                         buff.put(serialChunk[j]);
                         byte[] pan = pgToPan(raidaId, pg, serialChunk[j]);
-                       // Log.d("RAIDA " + raidaId, "proposed PAN via PG:" + bytesToHex(pan));
+                        // Log.d("RAIDA " + raidaId, "proposed PAN via PG:" + bytesToHex(pan));
                         pans.put(bytesToHex(serialChunk[j]), pan);
                     }
                     buff.put(pg);
@@ -971,7 +955,7 @@ public class RAIDA {
                     }
 
                     for (int r = 0; r < masterTickets.size(); r++) {
-                        if(masterTickets.get(r)!=null)
+                        if (masterTickets.get(r) != null)
                             buff.put(masterTickets.get(r));
 
                     }
@@ -980,7 +964,8 @@ public class RAIDA {
                     byte[] nonce = null;
                     byte[] encryptedBody = totalPownBody;
 
-                    // TODO remove hardcoded encryption false, and use actual AN of id coin as secret
+                    // TODO remove hardcoded encryption false, and use actual AN of id coin as
+                    // secret
                     encryption = false;
                     if (encryption) {
                         EncryptionOutput output = encryptBody(totalPownBody, new byte[16]);
@@ -995,7 +980,6 @@ public class RAIDA {
             }
             proposedPans.get(raidaId).putAll(pans);
 
-
             if (udpNum > 0) // checksum calculation needed only for multi packet calls
             {
                 totalBodySize = totalBodySize + 2; // to include the trailer bytes
@@ -1006,7 +990,6 @@ public class RAIDA {
                     udpCheckSum = generateCheckSum(allBody, totalBodySize, raidaId);
                 }
             }
-
 
             for (int k = 0; k < serials.length; k++) {
                 byte[] encryptedBody = allBody.get(k);
@@ -1052,15 +1035,13 @@ public class RAIDA {
 
             }
 
-
         }
 
     }
 
-
     // common function to handle pown, detect, find and get ticket
     public void commonUDPCall(int command, byte[][] mSerialno, byte[][][] an, byte[][][] inputPan,
-                              boolean encryption)
+            boolean encryption)
             throws Exception {
         int max_coins = MAX_COINS;
         if (command == 1)
@@ -1072,7 +1053,7 @@ public class RAIDA {
 
         Log.d("HEADER", "Total Coins:" + mSerialno.length + ", max coins:" + max_coins
                 + ", udp num:" + udpNum);
-        //maximum 64 packets in 1 request
+        // maximum 64 packets in 1 request
         if (udpNum > MAX_PACKETS) {
             int numRequests = (int) Math.ceil((double) udpNum / (double) MAX_PACKETS);
             for (int i = 0; i < numRequests; i++) {
@@ -1098,7 +1079,6 @@ public class RAIDA {
                 commonUDPCall(command, chunkSerialno, chunkAn, chunkInputPan, encryption);
             }
         } else {
-
 
             udpCalls = new ArrayList<>();
             retry = 0;
@@ -1127,28 +1107,39 @@ public class RAIDA {
                     }
                 }
 
-
             }
 
             /**
              * For Multi packet powning (typically powning more than 28 coins at one go,
-             * we need to use multiple UDP packets. When using multiple UDP packets, here are the rules -
-             * 1. Only First packet contains header and challenge. This packet does NOT contain the
+             * we need to use multiple UDP packets. When using multiple UDP packets, here
+             * are the rules -
+             * 1. Only First packet contains header and challenge. This packet does NOT
+             * contain the
              * separator (3E3E).
-             * 2. Intermediary packets contain just the body (no header or challenge or separator)
-             * 3. Last packet contains just the body(no header or challenge) AND the separator.
+             * 2. Intermediary packets contain just the body (no header or challenge or
+             * separator)
+             * 3. Last packet contains just the body(no header or challenge) AND the
+             * separator.
              *
-             * Even for multi packet powning, challenge is generated only once (for the first packet)
-             * Therefore, only 25 challenges are needed 1 for each RAIDA. We should generate them
-             * Beforehand, because we need to generate the CRC32 of the entire body (all packets
-             * combined) to be put in the header for multi packet request, at byte position 6
+             * Even for multi packet powning, challenge is generated only once (for the
+             * first packet)
+             * Therefore, only 25 challenges are needed 1 for each RAIDA. We should generate
+             * them
+             * Beforehand, because we need to generate the CRC32 of the entire body (all
+             * packets
+             * combined) to be put in the header for multi packet request, at byte position
+             * 6
              *
-             * We also need to generate the PANS of all the coins preemptively, so that we can generate
+             * We also need to generate the PANS of all the coins preemptively, so that we
+             * can generate
              * the total body, and calculate the CRC32.
              *
-             * Also, at one time when sending a multi packet request, we can send only 64 packets at a time.
-             * Therefore, if you are powning > 28x64 coins at a time, you need to split it into arrays
-             * of 28x64 coins at a time, then consider each of them a separate multi packet powning
+             * Also, at one time when sending a multi packet request, we can send only 64
+             * packets at a time.
+             * Therefore, if you are powning > 28x64 coins at a time, you need to split it
+             * into arrays
+             * of 28x64 coins at a time, then consider each of them a separate multi packet
+             * powning
              * request.
              */
             List<byte[]> allChallenges = new ArrayList<>();
@@ -1175,10 +1166,10 @@ public class RAIDA {
                         panChunk = pans[k];
                     int totalBodyLength = bodySize * serialChunk.length;
 
-
                     // if first packet, then also include the challenge in length
                     if (k == 0) {
-                        Log.d("RAIDA" + i, "Body size without challenge and footer= " + serialChunk.length + "x" + bodySize + "=" + totalBodyLength);
+                        Log.d("RAIDA" + i, "Body size without challenge and footer= " + serialChunk.length + "x"
+                                + bodySize + "=" + totalBodyLength);
                         Log.d("RAIDA" + i, "Body size with challenge=" + totalBodyLength + "+" + challenge.length);
 
                         totalBodyLength += challenge.length;
@@ -1198,16 +1189,15 @@ public class RAIDA {
                     for (int j = 0; j < serialChunk.length; j++) {
                         byte[] body = new byte[bodySize];
 
-                       // Log.d("RAIDA " + i, "SERIAL:" + bytesToHex(serialChunk[j]));
+                        // Log.d("RAIDA " + i, "SERIAL:" + bytesToHex(serialChunk[j]));
 
-                        //copy serial to body
+                        // copy serial to body
                         System.arraycopy(serialChunk[j], 0, body, 0, serialChunk[j].length);
 
-                        //copy an to body after serial
+                        // copy an to body after serial
                         System.arraycopy(anChunk[j][i], 0, body, serialChunk[j].length,
                                 anChunk[j][i].length);
-                        //Log.d("RAIDA " + i, "AN:" + bytesToHex(anChunk[j][i]));
-
+                        // Log.d("RAIDA " + i, "AN:" + bytesToHex(anChunk[j][i]));
 
                         if (command == 0) // if we are powning copy pan to body after an
                         {
@@ -1216,9 +1206,9 @@ public class RAIDA {
                                 pan = generatePan();
                             else
                                 pan = generatePan(bytesToHex(anChunk[j][i]));
-                          // Log.d("RAIDA " + i, "PAN:" + bytesToHex(pan));
+                            // Log.d("RAIDA " + i, "PAN:" + bytesToHex(pan));
                             int coinIndex = k * 28 + j;
-                           // Log.d("RAIDA " + i, "setting PAN for coin index:" + coinIndex);
+                            // Log.d("RAIDA " + i, "setting PAN for coin index:" + coinIndex);
                             if (cloudCoins.size() >= coinIndex)
                                 cloudCoins.get(coinIndex).setPan(i, pan);
                             else
@@ -1264,7 +1254,6 @@ public class RAIDA {
                         udpCheckSum = generateCheckSum(allBody, totalBodySize, i);
                     }
                 }
-
 
                 for (int k = 0; k < serials.length; k++) {
 
@@ -1314,9 +1303,7 @@ public class RAIDA {
 
     }
 
-
-    public void fixTCPCall(byte[][] mSerialno, int raidaId, boolean encryption) throws Exception
-    {
+    public void fixTCPCall(byte[][] mSerialno, int raidaId, boolean encryption) throws Exception {
         if (masterTickets.size() != 25) {
             throw new Exception("Need master tickets from each RAIDA to process fixing");
         }
@@ -1331,8 +1318,9 @@ public class RAIDA {
         byte udpCheckSum = (byte) 0;
         int totalPacketLength = 0;
 
-        // 4 bytes x 25 raidas master ticket = 100 bytes, 3 bytes for each coin, 16 bytes PG + challenge
-        int totalBodyLength = 100 + (3 * mSerialno.length) + 16+challenge.length;
+        // 4 bytes x 25 raidas master ticket = 100 bytes, 3 bytes for each coin, 16
+        // bytes PG + challenge
+        int totalBodyLength = 100 + (3 * mSerialno.length) + 16 + challenge.length;
         HashMap<String, byte[]> pans = new HashMap<String, byte[]>();
         // first make the body
 
@@ -1349,12 +1337,11 @@ public class RAIDA {
         byte[] pg = generateRandom(16);
         this.debug = oldFlag;
 
-
-        //loop through the coins to prepare the body by putting all serial numbers
+        // loop through the coins to prepare the body by putting all serial numbers
         for (int j = 0; j < mSerialno.length; j++) {
             // Log.d("RAIDA " + raidaId, "SERIAL:" + bytesToHex(serialChunk[j]));
             // Log.d("RAIDA " + raidaId, "PG:" + bytesToHex(pg));
-            //copy serial to body
+            // copy serial to body
             buff.put(mSerialno[j]);
             byte[] pan = pgToPan(raidaId, pg, mSerialno[j]);
             // Log.d("RAIDA " + raidaId, "proposed PAN via PG:" + bytesToHex(pan));
@@ -1365,7 +1352,7 @@ public class RAIDA {
 
         // now put all master tickets to body
         for (int r = 0; r < masterTickets.size(); r++) {
-            if(masterTickets.get(r)!=null)
+            if (masterTickets.get(r) != null)
                 buff.put(masterTickets.get(r));
 
         }
@@ -1374,7 +1361,8 @@ public class RAIDA {
         byte[] nonce = null;
         fullEncryptedBody = fullBody;
 
-        // TODO remove hardcoded encryption false, and use actual AN of id coin as secret
+        // TODO remove hardcoded encryption false, and use actual AN of id coin as
+        // secret
         encryption = false;
         if (encryption) {
             EncryptionOutput output = encryptBody(fullBody, new byte[16]);
@@ -1386,9 +1374,7 @@ public class RAIDA {
         header = generateHeader(raidaId, 3, fullEncryptedBody.length + footer.length,
                 udpCheckSum, encryption, nonce, mSerialno[0]);
 
-        totalPacketLength  = header.length + fullEncryptedBody.length + footer.length;
-
-
+        totalPacketLength = header.length + fullEncryptedBody.length + footer.length;
 
         byte[] mData = new byte[totalPacketLength];
 
@@ -1404,13 +1390,11 @@ public class RAIDA {
     }
 
     public void commonTCPCall(int command, byte[][] mSerialno, byte[][][] an, byte[][][] inputPan,
-                              boolean encryption)
-            throws Exception
-    {
+            boolean encryption)
+            throws Exception {
         int bodySize = 19;
         if (command == 0 || command == 2) // pown or find needs 35 bytes, detect and get ticket needs 19 bytes
             bodySize = 35;
-
 
         if (mSerialno.length != an.length) {
             throw new Exception("coin and an length not same");
@@ -1425,7 +1409,6 @@ public class RAIDA {
                     throw new Exception("pan and an length not same");
                 }
             }
-
 
         }
 
@@ -1447,16 +1430,14 @@ public class RAIDA {
             byte[] nonce = null;
 
             int totalBodyLength = bodySize * mSerialno.length;
-            Log.d("RAIDA" + i, "Body size without challenge and footer= " + mSerialno.length + "x" + bodySize + "=" + totalBodyLength);
+            Log.d("RAIDA" + i, "Body size without challenge and footer= " + mSerialno.length + "x" + bodySize + "="
+                    + totalBodyLength);
             Log.d("RAIDA" + i, "Body size with challenge=" + totalBodyLength + "+" + challenge.length);
 
             totalBodyLength += challenge.length;
 
-
-
             byte[] bufferBody = new byte[totalBodyLength];
             ByteBuffer buff = ByteBuffer.wrap(bufferBody);
-
 
             // first put the challenge in the body
             buff.put(challenge);
@@ -1470,20 +1451,18 @@ public class RAIDA {
                 byte[][] anChunk = an[k];
                 byte[][] panChunk = null;
 
-
                 if (command == 2)
                     panChunk = inputPan[k];
 
                 byte[] body = new byte[bodySize];
 
-                //copy serial to body
+                // copy serial to body
                 System.arraycopy(serialChunk, 0, body, 0, serialChunk.length);
 
-                //copy an to body after serial
+                // copy an to body after serial
                 System.arraycopy(anChunk[i], 0, body, serialChunk.length,
                         anChunk[i].length);
-                //Log.d("RAIDA " + i, "AN:" + bytesToHex(anChunk[j][i]));
-
+                // Log.d("RAIDA " + i, "AN:" + bytesToHex(anChunk[j][i]));
 
                 if (command == 0) // if we are powning copy pan to body after an
                 {
@@ -1493,7 +1472,7 @@ public class RAIDA {
                     else
                         pan = generatePan(bytesToHex(anChunk[i]));
                     // Log.d("RAIDA " + i, "PAN:" + bytesToHex(pan));
-                    int coinIndex = k ;
+                    int coinIndex = k;
                     // Log.d("RAIDA " + i, "setting PAN for coin index:" + coinIndex);
                     if (cloudCoins.size() >= coinIndex)
                         cloudCoins.get(coinIndex).setPan(i, pan);
@@ -1526,11 +1505,10 @@ public class RAIDA {
             }
 
             // generate header using id on in last param instead of first coin
-            header = generateHeader(i, command, fullEncryptedBody.length+ footer.length, (byte) 0, encryption, nonce, mSerialno[0]);
+            header = generateHeader(i, command, fullEncryptedBody.length + footer.length, (byte) 0, encryption, nonce,
+                    mSerialno[0]);
 
-            totalPacketLength  = header.length + fullEncryptedBody.length + footer.length;
-
-
+            totalPacketLength = header.length + fullEncryptedBody.length + footer.length;
 
             byte[] mData = new byte[totalPacketLength];
 
@@ -1580,13 +1558,13 @@ public class RAIDA {
         byte[] checksum = new byte[4];
         System.arraycopy(checksumTotal, checksumTotal.length - 4, checksum, 0, 4);
 
-        byte[] checksumByte = {checksum[3]};
-       // Log.d("RAIDA" + raida, "Calculating checksum of body:" + bytesToHex(commonData));
-       // Log.d("RAIDA" + raida, "CRC32 Checksum of body:" + bytesToHex(checksumByte));
+        byte[] checksumByte = { checksum[3] };
+        // Log.d("RAIDA" + raida, "Calculating checksum of body:" +
+        // bytesToHex(commonData));
+        // Log.d("RAIDA" + raida, "CRC32 Checksum of body:" + bytesToHex(checksumByte));
 
         return checksum[3];
     }
-
 
     public void pown(byte[][] mSerialno, byte[][][] an) throws Exception {
 
@@ -1620,7 +1598,6 @@ public class RAIDA {
         cloudCoins = new ArrayList<>();
         raidaResponses = new ArrayList<>();
 
-
         SerialAn extractedCoins = extractCoins(coins);
         int size = extractedCoins.size();
         if (size == 0) {
@@ -1630,39 +1607,40 @@ public class RAIDA {
         commonTCPCall(0, extractedCoins.getSerials(), extractedCoins.getAns(), null, false);
 
         /*
-        List<byte[]> serials = new ArrayList<>();
-        List<byte[][]> ans = new ArrayList<>();
-
-
-        for (int i = 0; i < coins.size(); i++) {
-            byte[] serial = new byte[3];
-            byte[][] an = new byte[25][16];
-            CloudCoin coin = coins.get(i);
-            if (coin.isValid()) {
-                cloudCoins.add(coin);
-                System.arraycopy(coin.getSerial(), 0, serial, 0, 3);
-                for (int j = 0; j < 25; j++) {
-                    System.arraycopy(coin.getAns()[j], 0, an[j], 0, 16);
-                }
-                serials.add(serial);
-                ans.add(an);
-            }
-        }
-        if (serials.size() > 0 && ans.size() > 0 && ans.size() == serials.size()) {
-            byte[][] mSerialno = new byte[serials.size()][3];
-            byte[][][] mAns = new byte[ans.size()][25][16];
-            for (int i = 0; i < serials.size(); i++) {
-                System.arraycopy(serials.get(i), 0, mSerialno[i], 0, 3);
-                for (int j = 0; j < 25; j++) {
-                    System.arraycopy(ans.get(i)[j], 0, mAns[i][j], 0, 16);
-                }
-            }
-
-            commonUDPCall(0, mSerialno, mAns, null, false);
-
-        } else {
-            throw new Exception("Coins not extractable to valid byte arrays");
-        }*/
+         * List<byte[]> serials = new ArrayList<>();
+         * List<byte[][]> ans = new ArrayList<>();
+         * 
+         * 
+         * for (int i = 0; i < coins.size(); i++) {
+         * byte[] serial = new byte[3];
+         * byte[][] an = new byte[25][16];
+         * CloudCoin coin = coins.get(i);
+         * if (coin.isValid()) {
+         * cloudCoins.add(coin);
+         * System.arraycopy(coin.getSerial(), 0, serial, 0, 3);
+         * for (int j = 0; j < 25; j++) {
+         * System.arraycopy(coin.getAns()[j], 0, an[j], 0, 16);
+         * }
+         * serials.add(serial);
+         * ans.add(an);
+         * }
+         * }
+         * if (serials.size() > 0 && ans.size() > 0 && ans.size() == serials.size()) {
+         * byte[][] mSerialno = new byte[serials.size()][3];
+         * byte[][][] mAns = new byte[ans.size()][25][16];
+         * for (int i = 0; i < serials.size(); i++) {
+         * System.arraycopy(serials.get(i), 0, mSerialno[i], 0, 3);
+         * for (int j = 0; j < 25; j++) {
+         * System.arraycopy(ans.get(i)[j], 0, mAns[i][j], 0, 16);
+         * }
+         * }
+         * 
+         * commonUDPCall(0, mSerialno, mAns, null, false);
+         * 
+         * } else {
+         * throw new Exception("Coins not extractable to valid byte arrays");
+         * }
+         */
 
     }
 
@@ -1680,7 +1658,6 @@ public class RAIDA {
         cloudCoins = new ArrayList<>();
         raidaResponses = new ArrayList<>();
 
-
         SerialAn extractedCoins = extractCoins(coins);
         int size = extractedCoins.size();
         if (size == 0) {
@@ -1690,7 +1667,6 @@ public class RAIDA {
         commonTCPCall(1, extractedCoins.getSerials(), extractedCoins.getAns(), null, false);
 
     }
-
 
     public void getTicket(byte[][] mSerialno, byte[][][] an) throws Exception {
         cloudCoins = new ArrayList<>();
@@ -1717,11 +1693,10 @@ public class RAIDA {
         if (size == 0) {
             throw new Exception("Coins not extractable to valid byte arrays");
         }
-        Log.d("TICKET","Trying to get tickets for fixing "+size+" coins");
+        Log.d("TICKET", "Trying to get tickets for fixing " + size + " coins");
         commonTCPCall(11, extractedCoins.getSerials(), extractedCoins.getAns(), null, false);
 
     }
-
 
     public void find(byte[][] mSerialno, byte[][][] an, byte[][][] pan) throws Exception {
         commonTCPCall(0, mSerialno, an, pan, false);
@@ -1763,9 +1738,9 @@ public class RAIDA {
                 }
 
                 byte[] totalFixBody = buff.array();
-                //EncryptionOutput output = encryptBody(totalFixBody,an[0][i]);
-                //byte[] nonce= output.getIv();
-                byte[] encryptedBody = totalFixBody;//output.getCiphertext();
+                // EncryptionOutput output = encryptBody(totalFixBody,an[0][i]);
+                // byte[] nonce= output.getIv();
+                byte[] encryptedBody = totalFixBody;// output.getCiphertext();
                 byte[] header = generateHeader(i, 3, udpNum);
                 byte[] mData = new byte[header.length + encryptedBody.length + footer.length];
 
@@ -1799,9 +1774,10 @@ public class RAIDA {
 
         if (raidaResponses.size() != 25) {
             Log.e("RAIDA", "Ticket Response Size(should be 25):" + raidaResponses.size());
-            throw new Exception("Number of RAIDA responses to fetch master ticket from must be exactly 25, found: " + raidaResponses.size());
+            throw new Exception("Number of RAIDA responses to fetch master ticket from must be exactly 25, found: "
+                    + raidaResponses.size());
         }
-        //first get the tickets out of responses
+        // first get the tickets out of responses
         for (int i = 0; i < 25; i++) {
             masterTickets.add(raidaResponses.get(i).getMasterTicket());
             proposedPans.add(new HashMap<String, byte[]>());
@@ -1828,7 +1804,8 @@ public class RAIDA {
             CloudCoin coin = cloudCoins.get(i);
             if (coin.getPassCount() < MIN_PASS) {
 
-                Log.d("RAIDA", "Coin:" + bytesToHex(coin.getSerial()) + " has " + coin.getPassCount() + " authentic raidas and hence excluded from fixing");
+                Log.d("RAIDA", "Coin:" + bytesToHex(coin.getSerial()) + " has " + coin.getPassCount()
+                        + " authentic raidas and hence excluded from fixing");
                 continue;
             }
             coin.copyAnsToPans();
@@ -1843,11 +1820,10 @@ public class RAIDA {
                     Log.d("RAIDA" + j, "Coin:" + bytesToHex(coin.getSerial()) + " queued for fixing");
                     fixableCoins.get(j).add(coin);
                 } else {
-                    Log.d("RAIDA" + j, "Coin:" + bytesToHex(coin.getSerial()) + " is already authentic on this raida and hence excluded from fixing");
-
+                    Log.d("RAIDA" + j, "Coin:" + bytesToHex(coin.getSerial())
+                            + " is already authentic on this raida and hence excluded from fixing");
 
                 }
-
 
             }
 
@@ -1857,7 +1833,6 @@ public class RAIDA {
         if (fixableCoins.size() == 0) {
             Log.d("RAIDA", "No Fixable coins");
         }
-
 
         for (int i = 0; i < fixableCoins.size(); i++) {
             if (fixableCoins.get(i).size() > 0) // theres any coins to fix on this raida
@@ -1874,57 +1849,52 @@ public class RAIDA {
 
         }
 
-
-
-
-
-
     }
 
     public int getNumFixRaidas() {
         return numFixRaidas;
     }
 
-
     public void setCallbacks(UDPCallBackInterface callbacks) {
         udpCallbacks = callbacks;
     }
     // COIN HEADER (0-31 bytes)
-    // FT CL ID ID SP EN HS HS HS HS HS HS HS HS HS FL - see https://github.com/worthingtonse/RAIDAX/blob/main/file_format.md for details. for standard CC, will be all 0
+    // FT CL ID ID SP EN HS HS HS HS HS HS HS HS HS FL - see
+    // https://github.com/worthingtonse/RAIDAX/blob/main/file_format.md for details.
+    // for standard CC, will be all 0
     // RC RC RC RC RC RC RC RC RC RC RC RC RC RC RC RC - will be random or zeroes.
     // COIN BODY (32-448 bytes)
-    // 32/33/34 = serial number, 35-47 (13 bytes) for powning status, 48 - 448 (400 bytes) = 16 bytes of an X 25 = 400 bytes
+    // 32/33/34 = serial number, 35-47 (13 bytes) for powning status, 48 - 448 (400
+    // bytes) = 16 bytes of an X 25 = 400 bytes
 
     public byte[] coinsToBinary(List<CloudCoin> coins) throws Exception {
-     int coinLength = (coins.size() * 416) +32;
-     byte[] coinData = new byte[coinLength];
-     for(int i=0;i<coins.size();i++)
-     {
-         byte[] coin = coinToBinary(coins.get(i));
-         if(i==0)
-         {
-             System.arraycopy(coin, 0, coinData, 0, 448);
-         }
-         else
-         {
-             int index = 32+(i*416);
-             System.arraycopy(coin, 32, coinData, index, 416);
-         }
+        int coinLength = (coins.size() * 416) + 32;
+        byte[] coinData = new byte[coinLength];
+        for (int i = 0; i < coins.size(); i++) {
+            byte[] coin = coinToBinary(coins.get(i));
+            if (i == 0) {
+                System.arraycopy(coin, 0, coinData, 0, 448);
+            } else {
+                int index = 32 + (i * 416);
+                System.arraycopy(coin, 32, coinData, index, 416);
+            }
 
-     }
-     return coinData;
+        }
+        return coinData;
     }
+
     public byte[] coinToBinary(CloudCoin coin) throws Exception {
         byte[] binary = new byte[448];
         if (!coin.isValid()) {
-            throw new Exception("Invalid Cloud coin object cannot be converted on binary coin, wrong serial or ans data");
+            throw new Exception(
+                    "Invalid Cloud coin object cannot be converted on binary coin, wrong serial or ans data");
         }
         // fill first 32 bytes with 0s
         for (int i = 0; i < 32; i++) {
             binary[i] = (byte) 0;
         }
 
-        binary[3] = (byte)1;
+        binary[3] = (byte) 1;
 
         // fill serial number
         System.arraycopy(coin.getSerial(), 0, binary, 32, 3);
@@ -1936,11 +1906,11 @@ public class RAIDA {
 
         // fill the ans with pans
         for (int i = 0; i < 25; i++) {
-            if(bytesToHex(coin.getPans()[i]) == "00000000000000000000000000000000")
-            {
-                Log.e("Critical Error", "PAN is all 0 for coin: " + bytesToHex(coin.getSerial())+" - this is likely a critical error");
+            if (bytesToHex(coin.getPans()[i]) == "00000000000000000000000000000000") {
+                Log.e("Critical Error", "PAN is all 0 for coin: " + bytesToHex(coin.getSerial())
+                        + " - this is likely a critical error");
             }
-            //Log.d("TEST", "Setting PAN to" + bytesToHex(coin.getPans()[i]));
+            // Log.d("TEST", "Setting PAN to" + bytesToHex(coin.getPans()[i]));
             System.arraycopy(coin.getPans()[i], 0, binary, 48 + (i * 16), 16);
         }
         return binary;
@@ -1953,7 +1923,7 @@ public class RAIDA {
         }
 
         byte[] serial = new byte[3];
-        //extract serial
+        // extract serial
         System.arraycopy(binary, 32, serial, 0, 3);
 
         // extract ans
@@ -1968,27 +1938,25 @@ public class RAIDA {
 
     // extract coin from a single or multi coin bytearray and return a list of coins
     public List<CloudCoin> binaryToCoins(byte[] binaries) throws Exception {
-        if (binaries.length % 448 != 0 && (binaries.length-32)%416!=0) {
-            throw new Exception("Invalid binary file because file size is "+binaries.length);
+        if (binaries.length % 448 != 0 && (binaries.length - 32) % 416 != 0) {
+            throw new Exception("Invalid binary file because file size is " + binaries.length);
         }
         int type = 0;
 
-        if((binaries.length-32) % 416 == 0)
-            type=1;
-
+        if ((binaries.length - 32) % 416 == 0)
+            type = 1;
 
         List<CloudCoin> coins = new ArrayList<>();
-        int numCoins = type == 0 ? binaries.length / 448 : (binaries.length-32)/416;
-        Log.d("POWN","Found:" + numCoins + " coins");
+        int numCoins = type == 0 ? binaries.length / 448 : (binaries.length - 32) / 416;
+        Log.d("POWN", "Found:" + numCoins + " coins");
 
-
-        if(type == 0) {
+        if (type == 0) {
             for (int j = 0; j < numCoins; j++) {
                 byte[] binary = new byte[448];
                 System.arraycopy(binaries, 0, binary, (j * 448), 448);
 
                 byte[] serial = new byte[3];
-                //extract serial
+                // extract serial
                 System.arraycopy(binary, 32, serial, 0, 3);
 
                 // extract ans
@@ -1996,30 +1964,25 @@ public class RAIDA {
 
                 for (int i = 0; i < 25; i++) {
                     System.arraycopy(binary, 48 + (i * 16), ans[i], 0, 16);
-                    Log.d("POWN: "+bytesToHex(serial),"AN "+i+": "+bytesToHex(ans[i]));
+                    Log.d("POWN: " + bytesToHex(serial), "AN " + i + ": " + bytesToHex(ans[i]));
 
                 }
                 coins.add(new CloudCoin(serial, ans, null));
             }
-        }
-        else
-        {
+        } else {
             for (int j = 0; j < numCoins; j++) {
                 byte[] binary = new byte[416];
-                Log.d("POWN","Extracting coin:"+j);
-                if(j==0)
-                {
+                Log.d("POWN", "Extracting coin:" + j);
+                if (j == 0) {
                     System.arraycopy(binaries, 32, binary, 0, 416);
-                }
-                    else
-                {
-                    int index = 32+(j * 416);
-                    Log.d("POWN: ","COPY:"+index+" to "+ (index+416));
+                } else {
+                    int index = 32 + (j * 416);
+                    Log.d("POWN: ", "COPY:" + index + " to " + (index + 416));
                     System.arraycopy(binaries, index, binary, 0, 416);
                 }
 
                 byte[] serial = new byte[3];
-                //extract serial
+                // extract serial
                 System.arraycopy(binary, 0, serial, 0, 3);
 
                 // extract ans
@@ -2027,7 +1990,7 @@ public class RAIDA {
 
                 for (int i = 0; i < 25; i++) {
                     System.arraycopy(binary, 16 + (i * 16), ans[i], 0, 16);
-                    Log.d("POWN: "+bytesToHex(serial),"AN "+i+": "+bytesToHex(ans[i]));
+                    Log.d("POWN: " + bytesToHex(serial), "AN " + i + ": " + bytesToHex(ans[i]));
 
                 }
                 coins.add(new CloudCoin(serial, ans, null));
@@ -2037,7 +2000,7 @@ public class RAIDA {
         return coins;
     }
 
-    //extract coin from already split serial/an array
+    // extract coin from already split serial/an array
     public List<CloudCoin> binaryToCoins(byte[][] serials, byte[][][] ans) throws Exception {
         if (serials.length <= 0 || ans.length <= 0 || serials.length != ans.length) {
             throw new Exception("Invalid binary file");
@@ -2047,7 +2010,7 @@ public class RAIDA {
         for (int j = 0; j < numCoins; j++) {
 
             byte[] serial = new byte[3];
-            //extract serial
+            // extract serial
             serial = serials[j];
 
             // extract ans
@@ -2063,36 +2026,27 @@ public class RAIDA {
         return cloudCoins;
     }
 
-    public ArrayList<CloudCoin> getAuthenticCoins()
-    {
+    public ArrayList<CloudCoin> getAuthenticCoins() {
         return authenticCoins;
     }
-
-
-
 
     public int getNumUDP() {
         return numUDP;
     }
 
     public void coinToPng(String origin, String destination, ArrayList<byte[]> coins) {
-        int byteSize = 416 * coins.size()+32;
+        int byteSize = 416 * coins.size() + 32;
         byte[] coinData = new byte[byteSize];
         ByteBuffer buff = ByteBuffer.wrap(coinData);
         for (int i = 0; i < coins.size(); i++) {
 
             if (i == 0 && coins.get(i).length == 448) {
                 buff.put(coins.get(i));
-            }
-            else
-            {
-                if(coins.get(i).length==416)
-                {
+            } else {
+                if (coins.get(i).length == 416) {
                     buff.put(coins.get(i));
-                }
-                else if(coins.get(i).length == 448)
-                {
-                    byte [] thiscoin = new byte[416];
+                } else if (coins.get(i).length == 448) {
+                    byte[] thiscoin = new byte[416];
                     System.arraycopy(coins.get(i), 32, thiscoin, 0, 416);
                     buff.put(thiscoin);
                 }
@@ -2104,7 +2058,7 @@ public class RAIDA {
     }
 
     public void coinToPng(InputStream origin, String destination, ArrayList<byte[]> coins) {
-        int byteSize = 416 * coins.size()+32;
+        int byteSize = 416 * coins.size() + 32;
 
         byte[] coinData = new byte[byteSize];
         ByteBuffer buff = ByteBuffer.wrap(coinData);
@@ -2112,16 +2066,11 @@ public class RAIDA {
             if (coins.get(i).length == 448) {
                 if (i == 0) {
                     buff.put(coins.get(i));
-                }
-                else
-                {
-                    if(coins.get(i).length==416)
-                    {
+                } else {
+                    if (coins.get(i).length == 416) {
                         buff.put(coins.get(i));
-                    }
-                    else if(coins.get(i).length == 448)
-                    {
-                        byte [] thiscoin = new byte[416];
+                    } else if (coins.get(i).length == 448) {
+                        byte[] thiscoin = new byte[416];
                         System.arraycopy(coins.get(i), 32, thiscoin, 0, 416);
                         buff.put(thiscoin);
                     }
@@ -2132,6 +2081,5 @@ public class RAIDA {
         Log.d("RAIDA", "Writing coin data:" + bytesToHex(coinByteArray));
         PngImage.addPropChunk(origin, destination, coinByteArray);
     }
-
 
 }
