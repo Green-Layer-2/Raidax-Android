@@ -7,10 +7,6 @@ android {
     compileSdkVersion 31
     buildToolsVersion "30.0.3"
 
-    lintOptions {
-        checkReleaseBuilds false
-        abortOnError false
-    }
 
     defaultConfig {
         applicationId "com.cloudcoin2.wallet"
@@ -39,6 +35,11 @@ android {
     buildFeatures {
         dataBinding true
     }
+    lint {
+        abortOnError false
+        checkReleaseBuilds false
+    }
+    namespace 'com.cloudcoin2.wallet'
 }
 
 dependencies {
