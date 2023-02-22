@@ -27,9 +27,11 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
+import java.security.KeyManagementException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
+import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.BitSet;
@@ -39,6 +41,10 @@ import java.util.Random;
 import java.util.zip.CRC32;
 
 import javax.crypto.spec.SecretKeySpec;
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
 
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -136,7 +142,7 @@ public class RAIDA {
     private List<UDPCall> udpCalls = new ArrayList<>();
     private boolean debug = false;
     private int retry = 0, mPassCount = 0, mResponseCount = 0;
-    private String SERVER_URL = "https://guardian0.chelgu.cz/host.txt";
+    private String SERVER_URL = "https://g1.raida-guardian-tx.us/coin4.txt";
     private int numUDP = 1;
     private UDPCallBackInterface udpCallbacks;
     private ArrayList<byte[]> masterTickets;
@@ -255,38 +261,59 @@ public class RAIDA {
         return SERVER_URL;
     }
 
+    private String readFromUnsecuredServer(String url) throws IOException, NoSuchAlgorithmException, KeyManagementException {
+        TrustManager[] trustAllCerts = new TrustManager[] {
+                new X509TrustManager() {
+                    public X509Certificate[] getAcceptedIssuers() {
+                        return null;
+                    }
+                    public void checkClientTrusted(X509Certificate[] certs, String authType) {
+                    }
+                    public void checkServerTrusted(X509Certificate[] certs, String authType) {
+                    }
+                }
+        };
+
+        SSLContext sslContext = SSLContext.getInstance("SSL");
+        sslContext.init(null, trustAllCerts, new java.security.SecureRandom());
+
+        HttpsURLConnection.setDefaultSSLSocketFactory(sslContext.getSocketFactory());
+        HttpsURLConnection.setDefaultHostnameVerifier((hostname, session) -> true);
+
+        HttpsURLConnection connection = (HttpsURLConnection) new URL(url).openConnection();
+        connection.setConnectTimeout(CONNECTION_TIMEOUT);
+        connection.setReadTimeout(CONNECTION_TIMEOUT);
+        connection.connect();
+
+        InputStream in = connection.getInputStream();
+        BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+        StringBuilder html = new StringBuilder();
+        for (String line; (line = reader.readLine()) != null;) {
+            html.append(line).append("\n");
+        }
+        in.close();
+
+        String serverList = html.toString();
+        if (serverList.length() == 0) {
+            throw new IOException("Unable to retrieve server list from: " + url);
+        }
+        return serverList;
+    }
+
     public String getServerList() {
         String url = getServerURL();
         Log.d("URL", url);
         try {
-            URLConnection connection = (new URL(url)).openConnection();
-            connection.setConnectTimeout(CONNECTION_TIMEOUT);
-            connection.setReadTimeout(CONNECTION_TIMEOUT);
-            connection.connect();
-
-            InputStream in = connection.getInputStream();
-            BufferedReader reader = new BufferedReader(new InputStreamReader(in));
-            StringBuilder html = new StringBuilder();
-            for (String line; (line = reader.readLine()) != null;) {
-                html.append(line).append("/n");
-            }
-            in.close();
-
-            // String rawdata = html.substring(0, html.length() - 2);
-            // Log.d("servertext", rawdata);
-            String serverList = html.toString();
-            if (serverList.length() == 0) {
-                Log.e("RAIDA", "Unable to retrieve server list from: " + url + ", trying again with another");
-                return getServerList();
-            }
-            return serverList;
-
+            return readFromUnsecuredServer(url);
         } catch (IOException e) {
-            Log.e("RAIDA", "Unable to retrieve server list from: " + url + ", trying again with another");
+            Log.e("RAIDA", "Unable to retrieve server list from: " + url + ", trying again with another", e);
             return getServerList();
+        } catch (NoSuchAlgorithmException | KeyManagementException e) {
+            Log.e("RAIDA", "Unable to create SSL context", e);
+            return "";
         }
     }
-
+    
     public ArrayList<RaidaItems> createServerList(String rawdata) throws Exception {
         if (rawdata != null) {
             String[] parts = rawdata.split("# Mirrors");
