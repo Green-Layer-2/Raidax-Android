@@ -313,7 +313,7 @@ public class RAIDA {
             return "";
         }
     }
-    
+
     public ArrayList<RaidaItems> createServerList(String rawdata) throws Exception {
         if (rawdata != null) {
             String[] parts = rawdata.split("# Mirrors");
@@ -322,7 +322,10 @@ public class RAIDA {
             String[] servers = part1.split("Primary RAIDA");
             String serverList = servers[1];
             // Log.d("serverList", serverList);
-            String[] data = serverList.split("/n");
+            String[] fdata = serverList.split("\n");
+
+            String[] data = CommonUtils.removeBlankElements(fdata);
+
             int length = data.length;
             raidaLists = new ArrayList<RaidaItems>();
             for (int i = 1; i < length; i++) {

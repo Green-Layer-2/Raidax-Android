@@ -108,6 +108,24 @@ public class CommonUtils {
         return  folderPath;
     }
 
+    public static String[] removeBlankElements(String[] arr) {
+        // Create a list to store non-blank elements
+        List<String> nonBlankElements = new ArrayList<String>();
+
+        // Loop through the input array
+        for (String str : arr) {
+            // Check if the string is not blank (i.e. not empty or only whitespace)
+            if (!str.trim().isEmpty()) {
+                // Add the non-blank string to the list
+                nonBlankElements.add(str);
+            }
+        }
+
+        // Convert the list back to an array
+        return nonBlankElements.toArray(new String[nonBlankElements.size()]);
+    }
+
+
     public static int countFiles(String folderName, String ext) {
         try {
             File folder = new File(folderName);
