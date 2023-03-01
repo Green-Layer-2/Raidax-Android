@@ -3,6 +3,7 @@ package com.cloudcoin2.wallet.Model;
 public class UDPCall {
     private byte[] data;
     private int index;
+    private int commandCode;
 
     public UDPCall(byte[] data, int index, int commandCode) {
         this.data = data;
@@ -34,6 +35,5 @@ public class UDPCall {
         this.commandCode = commandCode;
     }
 
-    private int commandCode;
 
 }

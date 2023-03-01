@@ -24,7 +24,6 @@ import java.net.InetAddress;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
 import java.net.URL;
-import java.net.URLConnection;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.security.KeyManagementException;
@@ -46,9 +45,6 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-
 /**
  * The RAIDA class implements the RAIDA version 2.0 protocol and implements the
  * following services -
@@ -64,7 +60,7 @@ import okhttp3.Request;
 public class RAIDA {
 
     private static final int MIN_PASS = 16;
-    private static final String SEPERATOR = Integer.toBinaryString((Integer.parseInt("3e3e", 16)));
+    private static final String SEPARATOR = Integer.toBinaryString((Integer.parseInt("3e3e", 16)));
     private static final int MAX_COINS = 28; // how many coins to pown/detect/find at a time
     private static final int MAX_DETECT = 50; // how many coins to fix at a time
     private static final int MAX_FIX = 290; // how many coins to fix at a time
@@ -322,9 +318,9 @@ public class RAIDA {
             String[] servers = part1.split("Primary RAIDA");
             String serverList = servers[1];
             // Log.d("serverList", serverList);
-            String[] fdata = serverList.split("\n");
+            String[] data = serverList.split("\n");
 
-            String[] data = CommonUtils.removeBlankElements(fdata);
+            //String[] data = CommonUtils.removeBlankElements(fdata);
 
             int length = data.length;
             raidaLists = new ArrayList<RaidaItems>();
@@ -357,9 +353,57 @@ public class RAIDA {
         raidaLists = raidaListList;
     }
 
+    public static byte[] generateXHeader(int raidaID, int coinID, int length) {
+
+        byte[] header = new byte[32];
+        // Fill in the request data with the echo command
+
+        header[0] = 0x01; // VR - Version of Routing header
+        header[1] = 0x00; // SP - Split ID (not used in this example)
+        header[2] = (byte) raidaID; // DA - Data Agent Index (not used in this example)
+        header[3] = 0x00; // SH - Shard ID (not used in this example)
+        header[4] = 0x00; // CG - Command Group (Authentication)
+        header[5] = 0x00; // CM - Command (Echo)
+        header[6] = 0x00; // ID - Cloud/Coin ID 0 (not used in this example)
+        header[7] = (byte) coinID; // ID - Cloud/Coin ID 1 (not used in this example)
+
+        // Fill in the Presentation group
+        header[8] = 0x01; // VR - Version of PLS
+        header[9] = 0x00; // AP - Application 0
+        header[10] = 0x00; // AP - Application 1
+        header[11] = 0x00; // CP - Compression (none)
+        header[12] = 0x00; // TR - Translation (none)
+        header[13] = 0x00; // AI - AI Translation (not used in this example)
+        header[14] = 0x00; // RE - Reserved (not used in this example)
+        header[15] = 0x00; // RE - Reserved (not used in this example)
+
+        // Fill in the Encryption group
+        header[16] = 0x00; // EN - Encryption Type (none)
+        header[17] = 0x00; // DE - Denomination (not used in this example)
+        header[18] = 0x00; // SN - Encryption SN 0 (not used in this example)
+        header[19] = 0x00; // SN - Encryption SN 1 (not used in this example)
+        header[20] = 0x00; // SN - Encryption SN 2 (not used in this example)
+        header[21] = 0X00; // SN - Encryption SN 3 (not used in this example)
+        header[22] = (byte) 0; // BL - Body Length (not used in this example)
+        header[23] = (byte) length; // BL - Body Length (not used in this example)
+
+        // Fill in the Nonce group
+        header[24] = 0x00; // NO - Nonce 0 (not used in this example)
+        header[25] = 0x00; // NO - Nonce 1 (not used in this example)
+        header[26] = 0x00; // NO - Nonce 2 (not used in this example)
+        header[27] = 0x00; // NO - Nonce 3 (not used in this example)
+        header[28] = 0x00; // NO - Nonce 4 (not used in this example)
+        header[29] = 0x00; // NO - Nonce 5 (not used in this example)
+        header[30] = 0x00; // NO - Nonce 6 /
+        header[31] = 0x00; // NO - Nonce 6 /
+
+        return header;
+    }
+
+
     public byte[] generateHeader(int raidaID, int type, int udpnum, byte udpChecksum, boolean encryption, byte[] nonce,
             byte[] mSerialNo) {
-        byte[] udpHeader = new byte[22];
+        byte[] udpHeader = new byte[32];
         byte[] serialNo = { (byte) 0, (byte) 0, (byte) 0 };
         if (nonce == null) {
             nonce = new byte[] { (byte) 0, (byte) 0, (byte) 0 };
@@ -388,28 +432,40 @@ public class RAIDA {
 
             }
         }
-        udpHeader[0] = 0;
+        udpHeader[0] = 1;
         udpHeader[1] = 0;
         udpHeader[2] = (byte) raidaID;
         udpHeader[3] = 0;
         udpHeader[4] = 0;
         udpHeader[5] = (byte) type;
         udpHeader[6] = udpChecksum;
-        udpHeader[7] = 0;
-        udpHeader[8] = coinType;
-        udpHeader[9] = nonce[0];
-        udpHeader[10] = nonce[1];
-        udpHeader[11] = nonce[2];
-        udpHeader[12] = (byte) 0xEE;
-        udpHeader[13] = (byte) 0xFF;
-        udpHeader[14] = size[0];
-        udpHeader[15] = size[1];
+        udpHeader[7] = 4;
+        udpHeader[8] = 1;
+        udpHeader[9] = 0;
+        udpHeader[10] = 0;
+        udpHeader[11] = 0;
+        udpHeader[12] = 0;
+        udpHeader[13] = 0;
+        udpHeader[14] = 0;
+        udpHeader[15] = 0;
         udpHeader[16] = mEnc;
         udpHeader[17] = 0;
         udpHeader[18] = 0;
         udpHeader[19] = serialNo[0];
         udpHeader[20] = serialNo[1];
         udpHeader[21] = serialNo[2];
+        udpHeader[22] = 0;
+        udpHeader[23] = 0;
+        udpHeader[24] = nonce[0];
+        udpHeader[25] = nonce[1];
+        udpHeader[26] = nonce[2];
+        udpHeader[27] = 0;
+        udpHeader[28] = 0;
+        udpHeader[29] = 0;
+        udpHeader[30] = 0;
+        udpHeader[31] = 0;
+
+
         Log.d("HEADER", bytesToHex(udpHeader));
 
         return udpHeader;
@@ -776,9 +832,11 @@ public class RAIDA {
 
         // Log.d("RANDOM SIZE", challenge.length+"");
         // Log.d("CHECKSUM SIZE", checksum.length+"");
-        byte[] mData = new byte[challenge.length + checksum.length];
+        byte[] mData = new byte[challenge.length + checksum.length+ 2];
         // Log.d("CHALLENGE SIZE", mData.length+"");
         // Log.d("FIRST", bytesToHex(challenge));
+        mData[mData.length - 2] = 0x3e;
+        mData[mData.length -1 ] = 0x3e;
         ByteBuffer buff = ByteBuffer.wrap(mData);
         buff.put(challenge);
         buff.put(checksum);
@@ -862,6 +920,26 @@ public class RAIDA {
         return generateRandom(length, null);
     }
 
+    public byte[] generateChallengeNew() {
+        // Generate a 12-byte random number
+        byte[] randomBytes = new byte[12];
+        new Random().nextBytes(randomBytes);
+
+        // Calculate the CRC32 hash of the random number
+        CRC32 crc = new CRC32();
+        crc.update(randomBytes);
+        int crcInt = (int) crc.getValue();
+        byte[] crcBytes = ByteBuffer.allocate(4).putInt(crcInt).array();
+
+        // Concatenate the random number and CRC32 hash to form the 16-byte challenge
+        byte[] challenge = new byte[16];
+        System.arraycopy(randomBytes, 0, challenge, 0, 12);
+        System.arraycopy(crcBytes, 0, challenge, 12, 4);
+
+        return challenge;
+    }
+
+
     public void echo() throws Exception {
         ticketing = false;
         Log.d("Echo", "Starting Echo task");
@@ -878,14 +956,20 @@ public class RAIDA {
 
         mList.clear();
         for (int i = 0; i < raidaLists.size(); i++) {
-            byte[] header = generateHeader(i, 4);
-            byte[] body = new BigInteger(SEPERATOR, 2).toByteArray();
+            byte[] header = generateHeader(i, 0);
+            byte[] body = generateChallenge();
+            byte[] eheader = generateXHeader(i,4, body.length);
             byte[] mData = new byte[header.length + body.length];
-            ByteBuffer buff = ByteBuffer.wrap(mData);
-            buff.put(header);
-            buff.put(body);
-            byte[] echoData = buff.array();
-            makeUdpCall(new UDPCall(echoData, i, 4));
+
+            byte[] request = new byte[eheader.length + body.length];
+            System.arraycopy(eheader, 0, request,0, eheader.length);
+            System.arraycopy(body, 0, request,32, body.length);
+
+//            ByteBuffer buff = ByteBuffer.wrap(header);
+//            buff.put(header);
+//            buff.put(body);
+//            byte[] echoData = buff.array();
+            makeUdpCall(new UDPCall(request, i, 4));
         }
     }
 
@@ -927,7 +1011,7 @@ public class RAIDA {
             List<byte[]> allChallenges = new ArrayList<byte[]>();
 
             int totalBodySize = 0;
-            byte[] footer = new BigInteger(SEPERATOR, 2).toByteArray();
+            byte[] footer = new BigInteger(SEPARATOR, 2).toByteArray();
             List<byte[]> allBody = new ArrayList<byte[]>();
             List<byte[]> allEncryptedBody = new ArrayList<byte[]>();
             List<byte[]> allNonce = new ArrayList<byte[]>();
@@ -1179,7 +1263,7 @@ public class RAIDA {
             }
             for (int i = 0; i < raidaLists.size(); i++) {
                 int totalBodySize = 0;
-                byte[] footer = new BigInteger(SEPERATOR, 2).toByteArray();
+                byte[] footer = new BigInteger(SEPARATOR, 2).toByteArray();
 
                 List<byte[]> allBody = new ArrayList<>();
                 List<byte[]> allEncryptedBody = new ArrayList<>();
@@ -1338,7 +1422,7 @@ public class RAIDA {
             throw new Exception("Need master tickets from each RAIDA to process fixing");
         }
 
-        byte[] footer = new BigInteger(SEPERATOR, 2).toByteArray();
+        byte[] footer = new BigInteger(SEPARATOR, 2).toByteArray();
 
         byte[] header;
 
@@ -1450,7 +1534,7 @@ public class RAIDA {
         for (int i = 0; i < raidaLists.size(); i++) {
             int totalPacketLength;
 
-            byte[] footer = new BigInteger(SEPERATOR, 2).toByteArray();
+            byte[] footer = new BigInteger(SEPARATOR, 2).toByteArray();
             byte[] header;
 
             byte[] fullBody;
@@ -1574,7 +1658,7 @@ public class RAIDA {
     private byte generateCheckSum(List<byte[]> allBody, int bodySize, int raida) {
         Log.d("RAIDA" + raida, "Body size:" + bodySize);
         Log.d("RAIDA" + raida, "Generating checksum for multi packet UDP");
-        byte[] footer = new BigInteger(SEPERATOR, 2).toByteArray();
+        byte[] footer = new BigInteger(SEPARATOR, 2).toByteArray();
         byte[] mData = new byte[bodySize];
         ByteBuffer commonBuffer = ByteBuffer.wrap(mData);
         for (int i = 0; i < allBody.size(); i++) {
@@ -1736,7 +1820,7 @@ public class RAIDA {
     public void fix(byte[][] mSerialno, byte[][] tickets) {
         ticketing = false;
         int udpNum = (int) Math.ceil(mSerialno.length / MAX_FIX);
-        byte[] footer = new BigInteger(SEPERATOR, 2).toByteArray();
+        byte[] footer = new BigInteger(SEPARATOR, 2).toByteArray();
         byte[][][] serials = splitSerials(mSerialno, MAX_FIX);
         retry = 0;
         udpCalls = new ArrayList<>();
