@@ -2052,13 +2052,40 @@ public class RAIDA {
 
     // extract coin from a single or multi coin bytearray and return a list of coins
     public List<CloudCoin> binaryToCoins(byte[] binaries) throws Exception {
-        if (binaries.length % 448 != 0 && (binaries.length - 32) % 416 != 0) {
+        if(binaries.length < 32) {
             throw new Exception("Invalid binary file because file size is " + binaries.length);
         }
+//        if (binaries.length % 448 != 0 && (binaries.length - 32) % 416 != 0) {
+//            throw new Exception("Invalid binary file because file size is " + binaries.length);
+//        }
         int type = 0;
-
         if ((binaries.length - 32) % 416 == 0)
             type = 1;
+
+        // Read first 32 bytes for file header
+        // This is commonn for all formats: 9, A, B
+
+        byte[] header = new byte[32];
+
+
+        System.arraycopy(binaries, 0, header, 0, 32);
+        // Read Byte 0 for Format
+        String format  = String.valueOf(header[0]);
+        // Read Byte 1 for Cloud ID
+        int cloudId  = header[1];
+
+        // Read Coin Count from Byte 6 and 7
+        int coinCount = ((header[6] & 0xFF) << 8) | (header[7] & 0xFF);
+        coinCount = header[6];
+        String encryptionType = String.valueOf(header[5]);
+        String md5Hash = new String(header, 8, 7);
+
+        // Read Coin id from byte 2 and 3
+        int coinId = ((header[2] & 0xFF) << 8) | (header[3] & 0xFF);
+        System.out.println(String.valueOf(header[0]));
+
+        byte[] last16Bytes = Arrays.copyOfRange(header, 16, 32);
+        String reciept = new String(last16Bytes);
 
         List<CloudCoin> coins = new ArrayList<>();
         int numCoins = type == 0 ? binaries.length / 448 : (binaries.length - 32) / 416;
