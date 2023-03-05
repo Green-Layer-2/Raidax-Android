@@ -9,6 +9,7 @@ import java.util.List;
 public class CloudCoin {
     private byte[] serial;
     private byte[][] ans;
+    private byte denomination ;
     private byte[][] pans;
     private byte[] pownStatus = {(byte) -1, (byte) -1, (byte) -1, (byte) -1, (byte) -1,
                                  (byte) -1, (byte) -1, (byte) -1, (byte) -1, (byte) -1,
@@ -74,6 +75,12 @@ public class CloudCoin {
 
     public void setSerial(byte[] serial) {
         this.serial = serial;
+    }
+
+    public byte getDenomination() { return this.denomination;}
+
+    public void setDenomination(byte denomination) {
+        this.denomination = denomination;
     }
 
     public byte[][] getAns() {

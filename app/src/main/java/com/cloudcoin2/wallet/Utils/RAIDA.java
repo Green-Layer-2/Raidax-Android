@@ -2067,7 +2067,6 @@ public class RAIDA {
 
         byte[] header = new byte[32];
 
-
         System.arraycopy(binaries, 0, header, 0, 32);
         // Read Byte 0 for Format
         String format  = String.valueOf(header[0]);
@@ -2088,8 +2087,62 @@ public class RAIDA {
         String reciept = new String(last16Bytes);
 
         List<CloudCoin> coins = new ArrayList<>();
-        int numCoins = type == 0 ? binaries.length / 448 : (binaries.length - 32) / 416;
+        int numCoins = coinCount;
         Log.d("POWN", "Found:" + numCoins + " coins");
+
+        byte[] coinData = Arrays.copyOfRange(binaries, 32, binaries.length );
+        int actualCoinCount = 0;
+
+        if(format.equals("9")) {
+            System.out.println("Inside");
+
+            if( coinData.length % 405 != 0) {
+                throw new Exception("Invalid binary file because file size is " + binaries.length);
+            }
+            actualCoinCount = coinData.length / 405;
+
+            if(actualCoinCount != coinCount) {
+                throw new Exception("Invalid binary file because coin count in header and coin data does not match " );
+            }
+
+            for (int j = 0; j < numCoins; j++) {
+                byte[] binary = new byte[405];
+                Log.d("Cloudcoin", "Start Pos: "+ (32+ (j * 405)) + ". Destination Pos:" + ( 32+ (j * 405)) );
+
+                System.arraycopy(binaries, (32+ (j * 405)), binary, 0, 405);
+//
+                int denomination = binary[0];
+                //byte[] serial = new byte[4];
+                byte[] serial = Arrays.copyOfRange(binary, 1, 5 );
+                // extract ans
+                byte[][] ans = new byte[25][16];
+
+                for (int i = 0; i < 25; i++) {
+                    System.arraycopy(binary, (5+ (i * 16)), ans[i], 0, 16);
+                    Log.d("POWN: " + bytesToHex(serial), "AN " + i + ": " + bytesToHex(ans[i]));
+                }
+                coins.add(new CloudCoin(serial, ans, null));
+            }
+            Log.d("Test:", "Coins Read:");
+        }
+        if(format == "A") {
+            if(coinData.length % 20 != 0) {
+                throw new Exception("Invalid binary file because file size is " + binaries.length);
+            }
+            actualCoinCount = coinData.length / 20;
+
+            if(actualCoinCount != coinCount) {
+                throw new Exception("Invalid binary file because coin count in header and coin data does not match " );
+            }
+
+        }
+        if(format == "B") {
+
+        }
+
+
+        System.out.println("Total Coins Read: " + actualCoinCount);
+
 
         if (type == 0) {
             for (int j = 0; j < numCoins; j++) {
