@@ -83,6 +83,7 @@ public class DepositFragment extends BaseFragment2 implements View.OnClickListen
     private RecyclerView rvIndicator;
     private TextView tvUpload, tvDeposit, tvCancel;
     private EditText etMemo;
+    private EditText txtLockerCode;
     private LinearLayout llProgress;
     private ImageView ivBack;
     private ImageView ivRefresh;
@@ -121,6 +122,7 @@ public class DepositFragment extends BaseFragment2 implements View.OnClickListen
     ArrayList<String> files;
     private ArrayList<IncomeFile> loadedIncome = new ArrayList<IncomeFile>();
     ConstraintLayout layout;
+    RAIDA raida = RAIDA.getInstance();
 
     private String bankDirPath, limboDirPath, counterfeitPath, importPath, frackedDirPath, trashPath;
     final static int REQUEST_CODE_IMPORT_DIR = 1;
@@ -134,13 +136,12 @@ public class DepositFragment extends BaseFragment2 implements View.OnClickListen
     protected void initializeComponent(@NonNull View view) {
         rvIndicator = view.findViewById(R.id.fragment_deposit_rvIndicator);
         layout = view.findViewById(R.id.constraint);
-        tvUpload = view.findViewById(R.id.fragment_deposit_tvUpload);
-        tvUpload.setOnClickListener(this);
         tvDeposit = view.findViewById(R.id.fragment_deposit_tvDeposit);
+        txtLockerCode = view.findViewById(R.id.txtLockerCode);
         tvDeposit.setOnClickListener(this);
         tvCancel = view.findViewById(R.id.fragment_deposit_tvCancel);
         tvCancel.setOnClickListener(this);
-        etMemo = view.findViewById(R.id.fragment_deposit_etStatus);
+
         llProgress = view.findViewById(R.id.fragment_deposit_llProgress);
         llProgress.setVisibility(View.GONE);
         ivBack = view.findViewById(R.id.fragment_deposit_ivBack);
@@ -156,6 +157,10 @@ public class DepositFragment extends BaseFragment2 implements View.OnClickListen
             mAdapter.addData(new EchoStatus(0, "Test"));
         }
         rvIndicator.setAdapter(mAdapter);
+        ArrayList<RaidaItems> raidalist = Constants.RAIDALISTS;
+        raida.setRaidaList(raidalist);
+        raida.setCallbacks(this);
+
     }
 
     @Override
@@ -205,16 +210,34 @@ public class DepositFragment extends BaseFragment2 implements View.OnClickListen
         st.execute();
     }
 
+    public void importFromLocker() {
+        String lockerCode = txtLockerCode.getText().toString();
+
+        if(lockerCode.length() == 0) {
+            Toast.makeText(getActivity(),"Please enter a valid locker code.",Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        llProgress.setVisibility(View.VISIBLE);
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                Log.e("Locker", lockerCode);
+                try {
+                    raida.importLockerCode(lockerCode);
+                }catch (Exception e) {
+                    Log.e("Lokcer", e.getMessage());
+                    e.printStackTrace();
+                }
+            }
+        }).start();
+    }
+
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
-            case R.id.fragment_deposit_tvUpload:
-                if (coinsToDelete.size() > 0)
-                    coinsToDelete.clear();
-                fixedServers = new ArrayList<>();
-                selectFile();
-                break;
             case R.id.fragment_deposit_tvCancel:
                 if (files != null && files.size() > 0) {
                     files.clear();
@@ -225,23 +248,7 @@ public class DepositFragment extends BaseFragment2 implements View.OnClickListen
                 }
                 break;
             case R.id.fragment_deposit_tvDeposit:
-                if (files != null && files.size() > 0) {
-                    llProgress.setVisibility(View.VISIBLE);
-                    new Thread(new Runnable() {
-                        @Override
-                        public void run() {
-                            loadIncomeFromFiles(files);
-                            pownCoins(loadedIncome);
-                            files.clear();
-                            if (loadedIncome != null && loadedIncome.size() > 0)
-                                loadedIncome.clear();
-                        }
-                    }).start();
-
-                } else {
-                    showError("Please select one or more Cloud Coin stacks to deposit");
-                }
-
+                importFromLocker();
                 break;
             case R.id.fragment_deposit_ivBack:
                 //noinspection deprecation
@@ -345,6 +352,8 @@ public class DepositFragment extends BaseFragment2 implements View.OnClickListen
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     public void ReportBack(byte[] lMsg, String hex, int commandCode, int raidaID, int sPassCount) {
+        Log.e("RAIDA", "Command Code:" + commandCode);
+
         if (commandCode == 4) {
             Log.d("echo response", String.valueOf(raidaID));
             char[] ch = new char[hex.length()];
