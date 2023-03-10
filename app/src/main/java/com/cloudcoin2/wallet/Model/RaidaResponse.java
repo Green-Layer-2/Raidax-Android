@@ -6,7 +6,7 @@ import android.util.Log;
 
 public class RaidaResponse {
 
-    byte raidaId;
+    public byte raidaId;
     byte shardId;
     byte status;
 
