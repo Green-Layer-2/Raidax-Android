@@ -123,7 +123,8 @@ public class RAIDA {
             "ANGPANG",
             "N/A", "N/A", "N/A", "N/A", "N/A", "N/A", "N/A", "N/A",
             "FREE ID",
-            "FREE ID"
+            "FREE ID",
+            "PEEK"
 
     };
     private static final char[] HEX_ARRAY = "0123456789ABCDEF".toCharArray();
@@ -543,7 +544,7 @@ public class RAIDA {
             public void run() {
                 // Log.d("size", String.valueOf(raidaLists.size()));
 
-                Log.d("RAIDA " + udp.getIndex(), "Running CMD:" + COMMANDS[udp.getCommandCode()] + " ON Server:"
+                Log.d("RAIDA " + udp.getIndex(), "Running CMD:" + udp.getCommandCode() + " ON Server:"
                         + raidaLists.get(udp.getIndex()).getServerAddress());
                 Log.d("RAIDA " + udp.getIndex(), "Request: " + bytesToHex(udp.getData()));
                 // System.out.println(raidaLists.get(i).getPorts());
@@ -568,7 +569,7 @@ public class RAIDA {
                     if (!ignore) {
 
                         Log.d("RAIDA" + udp.getIndex(),
-                                "Attempt #0 to get response to CMD:" + COMMANDS[udp.getCommandCode()]);
+                                "Attempt #0 to get response to CMD:" + udp.getCommandCode());
                         try {
 
                             getUDPResponse(dp, udp, ds, 0);
@@ -603,7 +604,7 @@ public class RAIDA {
 
             RaidaResponse response = new RaidaResponse(realData, udp.getCommandCode());
             Log.d("RAIDA " + response.getRaidaId(),
-                    "Response to CMD " + COMMANDS[udp.getCommandCode()] + ": " + bytesToHex(realData));
+                    "Response to CMD " + udp.getCommandCode() + ": " + bytesToHex(realData));
             ds.close();
 
             handleResponse(response, realData, udp.getCommandCode());
@@ -655,6 +656,9 @@ public class RAIDA {
                     break;
                 case 3:
                     handleFixResponse(lMsg, hex, response);
+                    break;
+                case 83:
+                    Log.d("PEEK","Got Peek Response"+ hex);
                     break;
             }
 
@@ -814,9 +818,7 @@ public class RAIDA {
                     cloudCoins.get(i).setPownStatus(raidaId, -1);
                     break;
             }
-
         }
-
     }
 
     public byte[] generateNonce() {
@@ -828,13 +830,7 @@ public class RAIDA {
         byte[] checksumTotal = generateCRC32(challenge);
         byte[] checksum = new byte[4];
         System.arraycopy(checksumTotal, checksumTotal.length - 4, checksum, 0, 4);
-        // Log.d("CRC32 4 bytes:",bytesToHex(checksum));
-
-        // Log.d("RANDOM SIZE", challenge.length+"");
-        // Log.d("CHECKSUM SIZE", checksum.length+"");
         byte[] mData = new byte[challenge.length + checksum.length+ 2];
-        // Log.d("CHALLENGE SIZE", mData.length+"");
-        // Log.d("FIRST", bytesToHex(challenge));
         mData[mData.length - 2] = 0x3e;
         mData[mData.length -1 ] = 0x3e;
         ByteBuffer buff = ByteBuffer.wrap(mData);
@@ -937,6 +933,38 @@ public class RAIDA {
         System.arraycopy(crcBytes, 0, challenge, 12, 4);
 
         return challenge;
+    }
+
+    public void importLockerCode(String code) throws Exception {
+        ticketing = false;
+        Log.d("Locker", "Starting Locker Import task");
+        raidaResponses.clear();
+        String html = null;
+        udpCalls = new ArrayList<>();
+        retry = 0;
+        byte[] Separator = "3E3E".getBytes();
+        if (raidaLists == null || raidaLists.size() == 0) {
+            html = getServerList();
+            if (html != null && html.length() > 0)
+                Log.d("RAIDA", html);
+            raidaLists = createServerList(html);
+        }
+
+        mList.clear();
+        for (int i = 0; i < raidaLists.size(); i++) {
+            byte[] challenge = generateChallenge();
+            String an = i + code;
+            byte[] md5Bytes = generateMD5Hash(an);
+
+            byte[] request = new byte[34];
+            System.arraycopy(challenge, 0, request,0, 16);
+            System.arraycopy(md5Bytes, 0, request,16, 16);
+
+            request[request.length -1] = 0x3e;
+            request[request.length -2] = 0x3e;
+
+            makeUdpCall(new UDPCall(request, i, 83));
+        }
     }
 
 
@@ -1639,6 +1667,39 @@ public class RAIDA {
 
     }
 
+    public static byte[] generateMD5Hash(String input) {
+        try {
+            // Create MessageDigest instance for MD5 hash
+            MessageDigest md = MessageDigest.getInstance("MD5");
+            // Add input bytes to digest
+            md.update(input.getBytes());
+            // Get the hash's bytes (16 bytes long)
+            byte[] hashBytes = md.digest();
+            // Return the first 16 bytes of the hash
+            return Arrays.copyOfRange(hashBytes, 0, 16);
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException("Error generating MD5 hash", e);
+        }
+    }
+
+    public static String generateM5Hash(String input) {
+        try {
+            // Create MessageDigest instance for M5 hash
+            MessageDigest md = MessageDigest.getInstance("MD5");
+            // Add password bytes to digest
+            md.update(input.getBytes());
+            // Get the hash's bytes
+            byte[] hashBytes = md.digest();
+            // Convert to hexadecimal representation
+            StringBuilder sb = new StringBuilder();
+            for (byte b : hashBytes) {
+                sb.append(String.format("%02x", b));
+            }
+            return sb.toString();
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException("Error generating M5 hash", e);
+        }
+    }
     private byte[] pgToPan(int raida, byte[] panGenerator, byte[] serial) {
         final String MD5 = "MD5";
         String panString = String.valueOf(raida) + Integer.parseInt(bytesToHex(serial), 16) + bytesToHex(panGenerator);
@@ -2094,7 +2155,6 @@ public class RAIDA {
         int actualCoinCount = 0;
 
         if(format.equals("9")) {
-            System.out.println("Inside");
 
             if( coinData.length % 405 != 0) {
                 throw new Exception("Invalid binary file because file size is " + binaries.length);
@@ -2142,7 +2202,6 @@ public class RAIDA {
 
 
         System.out.println("Total Coins Read: " + actualCoinCount);
-
 
         if (type == 0) {
             for (int j = 0; j < numCoins; j++) {

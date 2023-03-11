@@ -136,19 +136,6 @@
             app:layout_constraintTop_toBottomOf="@+id/fragment_wallet_rlNetworkStrip" />
 
 
-        <TextView
-            android:id="@+id/fragment_deposit_tvUpload"
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/_50sdp"
-            android:layout_marginTop="@dimen/_10sdp"
-            android:background="@drawable/design_box_transparent_white"
-            android:fontFamily="@font/gotham_bold"
-            android:gravity="center"
-            android:text="Select CLOUDCOINS"
-            android:textAllCaps="true"
-            android:textColor="@color/white"
-            android:textSize="18sp"
-            app:layout_constraintTop_toBottomOf="@+id/textView" />
 
 
         <LinearLayout
@@ -157,28 +144,29 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/_10sdp"
             android:orientation="vertical"
-            app:layout_constraintTop_toBottomOf="@+id/fragment_deposit_tvUpload">
+            app:layout_constraintTop_toBottomOf="@+id/textView">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/gotham_bold"
-                android:text="Memo"
+                android:text="Add Funds"
                 android:textColor="@color/white"
                 android:textSize="16sp" />
 
             <EditText
-                android:id="@+id/fragment_deposit_etStatus"
+                android:id="@+id/txtLockerCode"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/_50sdp"
                 android:layout_marginTop="@dimen/_5sdp"
                 android:background="@drawable/design_box_background"
                 android:fontFamily="@font/gotham_book"
                 android:gravity="center_vertical"
-                android:hint="Your Memo"
+                android:hint="Enter Code"
                 android:maxLines="1"
                 android:imeOptions="actionDone"
                 android:singleLine="true"
+                android:text="Y8B5GTD"
                 android:paddingStart="@dimen/_25sdp"
                 android:textColor="@color/colorLightGrayishBlue"
                 android:textColorHint="@color/colorLightGrayishBlue"
@@ -195,7 +183,7 @@
             android:background="@drawable/design_button_background"
             android:fontFamily="@font/gotham_medium"
             android:gravity="center"
-            android:text="Deposit"
+            android:text="Submit Code"
             android:textAllCaps="true"
             android:textColor="@color/white"
             android:textSize="18sp"
