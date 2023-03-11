@@ -279,7 +279,7 @@ public class RAIDAX {
         // processResults(response);
         // }
         processEchoResults(results);
-        connectionPool.closeAllConnections();
+        connectionPool.releaseAllConnections();
 
     }
 

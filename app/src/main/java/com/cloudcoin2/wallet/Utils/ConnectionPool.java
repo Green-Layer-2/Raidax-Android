@@ -31,6 +31,24 @@ public class ConnectionPool<T> {
         availableConnections.release();
     }
 
+    public void releaseAllConnections() {
+        for (T connection : connectionQueue) {
+            try {
+                if (connection instanceof DatagramSocket) {
+                    DatagramSocket socket = (DatagramSocket) connection;
+                    socket.close();
+                } else {
+                    // Handle other types of connections here
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        connectionQueue.clear();
+        availableConnections.release(maxConnections);
+    }
+
+
     public void closeAllConnections() {
         for (T connection : connectionQueue) {
             try {
