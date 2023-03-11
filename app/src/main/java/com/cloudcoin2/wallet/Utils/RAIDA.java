@@ -662,8 +662,8 @@ public class RAIDA {
                     break;
             }
 
-            Log.d("RAIDA" + response.getRaidaId(), "Going to callback with command code " + commandCode);
-            udpCallbacks.ReportBack(lMsg, hex, commandCode, response.getRaidaId(), mPassCount);
+            Log.d("RAIDA" + response.getRaidaId(), "Going to callback with command code " + commandCode+ hex);
+            //udpCallbacks.ReportBack(lMsg, hex, commandCode, response.getRaidaId(), mPassCount);
         }
     }
 

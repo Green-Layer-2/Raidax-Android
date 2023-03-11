@@ -35,11 +35,14 @@ import com.cloudcoin2.wallet.Model.EchoStatus;
 import com.cloudcoin2.wallet.Model.IncomeFile;
 import com.cloudcoin2.wallet.Model.RaidaItems;
 import com.cloudcoin2.wallet.R;
+import com.cloudcoin2.wallet.Utils.CommandCodes;
 import com.cloudcoin2.wallet.Utils.CommonUtils;
 import com.cloudcoin2.wallet.Utils.Constants;
 import com.cloudcoin2.wallet.Utils.CouldcoinApplication;
+import com.cloudcoin2.wallet.Utils.EchoResult;
 import com.cloudcoin2.wallet.Utils.KotlinUtils;
 import com.cloudcoin2.wallet.Utils.RAIDA;
+import com.cloudcoin2.wallet.Utils.RAIDAX;
 import com.cloudcoin2.wallet.Utils.ScreeUtils;
 import com.cloudcoin2.wallet.Utils.UDPCallBackInterface;
 import com.cloudcoin2.wallet.base.BaseFragment2;
@@ -77,6 +80,7 @@ import ar.com.hjg.pngj.chunks.PngChunk;
  * Created by Arka Chakraborty on 15/02/22
  */
 public class DepositFragment extends BaseFragment2 implements View.OnClickListener, UDPCallBackInterface {
+    private RAIDAX raidax = RAIDAX.getInstance();
 
     private ArrayList<EchoStatus> mList = new ArrayList<>();
     private IndicatorAdapter mAdapter;
@@ -157,9 +161,6 @@ public class DepositFragment extends BaseFragment2 implements View.OnClickListen
             mAdapter.addData(new EchoStatus(0, "Test"));
         }
         rvIndicator.setAdapter(mAdapter);
-        ArrayList<RaidaItems> raidalist = Constants.RAIDALISTS;
-        raida.setRaidaList(raidalist);
-        raida.setCallbacks(this);
 
     }
 
@@ -168,7 +169,7 @@ public class DepositFragment extends BaseFragment2 implements View.OnClickListen
         int size = ScreeUtils.INSTANCE.getScreenWidth(getBaseActivity()) -
                 getResources().getDimensionPixelSize(R.dimen._220sdp);
         int itemWidth = (size / 25);
-        setdata(itemWidth);
+        //setdata(itemWidth);
         files = null;
         //File path = getActivity().getExternalFilesDir("");
         File path = new File(CouldcoinApplication.CloudcoinHome );
@@ -184,7 +185,20 @@ public class DepositFragment extends BaseFragment2 implements View.OnClickListen
         importPath = CommonUtils.createDirectory(path, IMPORT_DIR_NAME, DIR_BASE);
         frackedDirPath = CommonUtils.createDirectory(path, FRACKED_DIR_NAME, DIR_BASE);
         trashPath = CommonUtils.createDirectory(path, TRASH_DIR_NAME, DIR_BASE);
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    echo();
+                }catch (Exception e) {
+                    Log.e("RAIDAX", e.getMessage());
+                }
+            }
+        }).start();
+
         fetchTask();
+
 
         Log.e("TAG", "Fetched all");
     }
@@ -210,6 +224,36 @@ public class DepositFragment extends BaseFragment2 implements View.OnClickListen
         st.execute();
     }
 
+    private void echo() {
+        try {
+            raidax.execute(CommandCodes.Echo);
+            EchoResult result = raidax.getEchoResult();
+            int i =0;
+            String status  = "failure";
+            for (String res: result.getResponseCodes()) {
+                if(res.equals("FA")) status = "success";
+                else status = "failure";
+                mAdapter.replaceData(new EchoStatus(i,status),i);
+                i++;
+            }
+
+            rvIndicator.post(new Runnable() {
+                @SuppressLint("NotifyDataSetChanged")
+                @Override
+                public void run() {
+                    mAdapter.notifyDataSetChanged();
+                }
+            });
+
+            //setupListeners(true);
+
+        }
+        catch (Exception e) {
+
+        }
+
+    }
+
     public void importFromLocker() {
         String lockerCode = txtLockerCode.getText().toString();
 
@@ -225,7 +269,7 @@ public class DepositFragment extends BaseFragment2 implements View.OnClickListen
             public void run() {
                 Log.e("Locker", lockerCode);
                 try {
-                    raida.importLockerCode(lockerCode);
+                    raidax.importLockerCode(lockerCode);
                 }catch (Exception e) {
                     Log.e("Lokcer", e.getMessage());
                     e.printStackTrace();
@@ -354,7 +398,7 @@ public class DepositFragment extends BaseFragment2 implements View.OnClickListen
     public void ReportBack(byte[] lMsg, String hex, int commandCode, int raidaID, int sPassCount) {
         Log.e("RAIDA", "Command Code:" + commandCode);
 
-        if (commandCode == 4) {
+        if (commandCode == 5) {
             Log.d("echo response", String.valueOf(raidaID));
             char[] ch = new char[hex.length()];
             for (int i = 0; i < hex.length(); i++) {

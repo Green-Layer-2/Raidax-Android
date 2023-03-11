@@ -51,13 +51,34 @@ public class Protocol {
     }
 
 
-    public static byte[] GenerateRequest(int raidaID, int commandCode) {
+    public static byte[] GenerateRequest(int raidaID, int commandCode, String code ) {
         if(commandCode == CommandCodes.Echo) {
             byte[] body = generateChallenge();
-            byte[] eheader = generateXHeader(raidaID, commandCode, body.length);
+            byte[] header = generateXHeader(raidaID, commandCode, body.length);
 
-            byte[] request = new byte[eheader.length + body.length];
-            System.arraycopy(eheader, 0, request, 0, eheader.length);
+            byte[] request = new byte[header.length + body.length];
+            System.arraycopy(header, 0, request, 0, header.length);
+            System.arraycopy(body, 0, request, 32, body.length);
+
+            return request;
+        }
+        if(commandCode == CommandCodes.Peek) {
+
+            byte[] challenge = generateChallenge();
+            String an = raidaID + code;
+            byte[] md5Bytes = Utils.generateMD5Hash(an);
+
+            byte[] body = new byte[34];
+            byte[] header = generateXHeader(raidaID, commandCode, body.length);
+
+            System.arraycopy(challenge, 0, body,0, 16);
+            System.arraycopy(md5Bytes, 0, body,16, 16);
+
+            body[body.length -1] = 0x3e;
+            body[body.length -2] = 0x3e;
+
+            byte[] request = new byte[header.length + body.length];
+            System.arraycopy(header, 0, request, 0, header.length);
             System.arraycopy(body, 0, request, 32, body.length);
 
             return request;

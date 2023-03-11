@@ -1,5 +1,8 @@
 package com.cloudcoin2.wallet.Utils;
 import java.nio.ByteBuffer;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.Arrays;
 import java.util.zip.CRC32;
 
 public class Utils {
@@ -28,6 +31,21 @@ public class Utils {
         String enc = String.format("%08X", crc.getValue());
 
         return longToBytes(crc.getValue());
+    }
+
+    public static byte[] generateMD5Hash(String input) {
+        try {
+            // Create MessageDigest instance for MD5 hash
+            MessageDigest md = MessageDigest.getInstance("MD5");
+            // Add input bytes to digest
+            md.update(input.getBytes());
+            // Get the hash's bytes (16 bytes long)
+            byte[] hashBytes = md.digest();
+            // Return the first 16 bytes of the hash
+            return Arrays.copyOfRange(hashBytes, 0, 16);
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException("Error generating MD5 hash", e);
+        }
     }
 
 

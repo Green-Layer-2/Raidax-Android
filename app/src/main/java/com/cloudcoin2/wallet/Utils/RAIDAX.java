@@ -3,49 +3,33 @@ import java.io.IOException;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
-import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.math.BigInteger;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
-import java.net.Socket;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
-import java.security.KeyManagementException;
 import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.cert.X509Certificate;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.BitSet;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
-import java.util.zip.CRC32;
 
-import javax.crypto.spec.SecretKeySpec;
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 import java.util.concurrent.*;
-import static com.cloudcoin2.wallet.Utils.EncryptionOutputKt.encrypt;
 
 import android.util.Log;
 
-import com.cloudcoin2.wallet.Model.CloudCoin;
-import com.cloudcoin2.wallet.Model.EchoStatus;
 import com.cloudcoin2.wallet.Model.RaidaItems;
-import com.cloudcoin2.wallet.Model.SerialAn;
 import com.cloudcoin2.wallet.Model.UDPCall;
 
 
@@ -112,7 +96,6 @@ public class RAIDAX {
     };
 
     private static RAIDAX raida;
-    private final ArrayList<EchoStatus> mList = new ArrayList<>(25);
 
     public static RAIDAX getInstance() {
         if (raida == null) {
@@ -123,53 +106,6 @@ public class RAIDAX {
             }
         }
         return raida;
-    }
-
-    public static byte[] generateXHeader(int raidaID, int coinID, int length) {
-
-        byte[] header = new byte[32];
-        // Fill in the request data with the echo command
-
-        header[0] = 0x01; // VR - Version of Routing header
-        header[1] = 0x00; // SP - Split ID (not used in this example)
-        header[2] = (byte) raidaID; // DA - Data Agent Index (not used in this example)
-        header[3] = 0x00; // SH - Shard ID (not used in this example)
-        header[4] = 0x00; // CG - Command Group (Authentication)
-        header[5] = 0x00; // CM - Command (Echo)
-        header[6] = 0x00; // ID - Cloud/Coin ID 0 (not used in this example)
-        header[7] = (byte) coinID; // ID - Cloud/Coin ID 1 (not used in this example)
-
-        // Fill in the Presentation group
-        header[8] = 0x01; // VR - Version of PLS
-        header[9] = 0x00; // AP - Application 0
-        header[10] = 0x00; // AP - Application 1
-        header[11] = 0x00; // CP - Compression (none)
-        header[12] = 0x00; // TR - Translation (none)
-        header[13] = 0x00; // AI - AI Translation (not used in this example)
-        header[14] = 0x00; // RE - Reserved (not used in this example)
-        header[15] = 0x00; // RE - Reserved (not used in this example)
-
-        // Fill in the Encryption group
-        header[16] = 0x00; // EN - Encryption Type (none)
-        header[17] = 0x00; // DE - Denomination (not used in this example)
-        header[18] = 0x00; // SN - Encryption SN 0 (not used in this example)
-        header[19] = 0x00; // SN - Encryption SN 1 (not used in this example)
-        header[20] = 0x00; // SN - Encryption SN 2 (not used in this example)
-        header[21] = 0X00; // SN - Encryption SN 3 (not used in this example)
-        header[22] = (byte) 0; // BL - Body Length (not used in this example)
-        header[23] = (byte) length; // BL - Body Length (not used in this example)
-
-        // Fill in the Nonce group
-        header[24] = 0x00; // NO - Nonce 0 (not used in this example)
-        header[25] = 0x00; // NO - Nonce 1 (not used in this example)
-        header[26] = 0x00; // NO - Nonce 2 (not used in this example)
-        header[27] = 0x00; // NO - Nonce 3 (not used in this example)
-        header[28] = 0x00; // NO - Nonce 4 (not used in this example)
-        header[29] = 0x00; // NO - Nonce 5 (not used in this example)
-        header[30] = 0x00; // NO - Nonce 6 /
-        header[31] = 0x00; // NO - Nonce 6 /
-
-        return header;
     }
 
     public byte[] generateRandom(int length) {
@@ -216,42 +152,48 @@ public class RAIDAX {
         return challengeData;
     }
 
-    public void execute(int commandCode) throws InterruptedException {
-        synchronized (lock) {
-            if (isExecuting) {
-                throw new IllegalStateException("Cannot execute while another command is already running");
-            }
-            isExecuting = true;
-        }
+    public static byte[] generateMD5Hash(String input) {
         try {
-            if (commandCode == CommandCodes.Echo) {
-                try {
-                    doEcho();
-                } catch (Exception e) {
-
-                }
-            }
-        } finally {
-            synchronized (lock) {
-                isExecuting = false;
-            }
+            // Create MessageDigest instance for MD5 hash
+            MessageDigest md = MessageDigest.getInstance("MD5");
+            // Add input bytes to digest
+            md.update(input.getBytes());
+            // Get the hash's bytes (16 bytes long)
+            byte[] hashBytes = md.digest();
+            // Return the first 16 bytes of the hash
+            return Arrays.copyOfRange(hashBytes, 0, 16);
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException("Error generating MD5 hash", e);
         }
     }
 
-    public void doEcho() throws Exception {
-        String html = null;
-        udpCalls = new ArrayList<>();
-        retry = 0;
-        if (raidaLists == null || raidaLists.size() == 0) {
-            html = getServerList();
-            if (html != null && html.length() > 0)
-                System.out.print(html);
-            raidaLists = createServerList(html);
+    public void loadServers() {
+        try {
+            Log.d("Locker", "Starting Locker Import task");
+            raidaResponses.clear();
+            String html = null;
+            udpCalls = new ArrayList<>();
+            retry = 0;
+            byte[] Separator = "3E3E".getBytes();
+            if (raidaLists == null || raidaLists.size() == 0) {
+                html = getServerList();
+                if (html != null && html.length() > 0)
+                    Log.d("RAIDA", html);
+                raidaLists = createServerList(html);
+            }
+
+        }catch (Exception e) {
+
         }
 
-        mList.clear();
+
+    }
+
+    public void importLockerCode(String code) throws Exception {
+        loadServers();
+
         for (int i = 0; i < raidaLists.size(); i++) {
-            byte[] request = Protocol.GenerateRequest(i, CommandCodes.Echo);
+            byte[] request = Protocol.GenerateRequest(i, CommandCodes.Peek, code);
             udpCalls.add(new UDPCall(request, i, CommandCodes.Echo));
         }
 
@@ -275,12 +217,63 @@ public class RAIDAX {
                 // Handle any exceptions thrown during the execution of the task
             }
         }
-        // for(RaidaResponse response: results) {
-        // processResults(response);
-        // }
-        processEchoResults(results);
+        processPeekResults(results);
         connectionPool.releaseAllConnections();
 
+
+    }
+
+    public void execute(int commandCode) throws InterruptedException {
+        synchronized (lock) {
+            if (isExecuting) {
+                throw new IllegalStateException("Cannot execute while another command is already running");
+            }
+            isExecuting = true;
+        }
+        try {
+            if (commandCode == CommandCodes.Echo) {
+                try {
+                    echo();
+                } catch (Exception e) {
+                }
+            }
+        } finally {
+            synchronized (lock) {
+                isExecuting = false;
+            }
+        }
+    }
+
+    public void echo() throws Exception {
+        loadServers();
+
+        for (int i = 0; i < raidaLists.size(); i++) {
+            byte[] request = Protocol.GenerateRequest(i, CommandCodes.Echo, "");
+            udpCalls.add(new UDPCall(request, i, CommandCodes.Echo));
+        }
+
+        ExecutorService executorService = Executors.newCachedThreadPool();
+        List<Future<RaidaResponse>> futures = new ArrayList<>();
+
+        // Assuming you have a list of UDPCall objects called udpCalls
+        for (UDPCall udpCall : udpCalls) {
+            Future<RaidaResponse> future = executorService.submit(() -> executeCommand(udpCall));
+            futures.add(future);
+        }
+
+        executorService.shutdown();
+        executorService.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
+
+        List<RaidaResponse> results = new ArrayList<>();
+        for (Future<RaidaResponse> future : futures) {
+            try {
+                results.add(future.get());
+            } catch (ExecutionException e) {
+                // Handle any exceptions thrown during the execution of the task
+            }
+        }
+        processEchoResults(results);
+        connectionPool.releaseAllConnections();
     }
 
     public void processResults(List<RaidaResponse> results, int commandCode) {
@@ -291,10 +284,6 @@ public class RAIDAX {
         }
     }
 
-    public void processResults(RaidaResponse response) {
-        System.out.println("Got Result from :" + response.raidaId + ". \nResponse: " + response.getResponseHex());
-    }
-
     public void processEchoResults(List<RaidaResponse> results) {
         EchoResult echoResult = new EchoResult(0, 0);
         echoResult.compute(results);
@@ -303,6 +292,15 @@ public class RAIDAX {
         System.out.println("Got Fail Results:" + echoResult.getFailCount());
         this.echoResult = echoResult;
     }
+
+    public void processPeekResults(List<RaidaResponse> results) {
+
+        for (RaidaResponse result:
+             results) {
+            Log.d("RAIDAX", Utils.bytesToHex(result.getResponse()));
+        }
+    }
+
 
     public RaidaResponse executeCommand(UDPCall udp) throws InterruptedException {
         DatagramSocket ds = connectionPool.getConnection();
@@ -324,15 +322,12 @@ public class RAIDAX {
             ds.setSoTimeout(UDP_CONNECTION_TIMEOUT);
 
             try {
-                byte[] lMsg = new byte[500];
-
                 byte[] realData = null;
                 DatagramPacket rdp;
-                rdp = new DatagramPacket(lMsg, lMsg.length);
+                rdp = new DatagramPacket(new byte[udp.getData().length], udp.getData().length);
 
                 ds.receive(rdp);
-                realData = rdp.getData();
-
+                realData = Arrays.copyOf(rdp.getData(), rdp.getLength());
                 RaidaResponse response = new RaidaResponse(realData, udp.getCommandCode());
                 ds.close();
                 return response;
@@ -359,137 +354,8 @@ public class RAIDAX {
         return errorResponse;
     }
 
-    public void makeEcho() throws Exception {
-        raidaResponses.clear();
-        String html = null;
-        udpCalls = new ArrayList<>();
-        retry = 0;
-        if (raidaLists == null || raidaLists.size() == 0) {
-            html = getServerList();
-            if (html != null && html.length() > 0)
-                System.out.print(html);
-            raidaLists = createServerList(html);
-        }
-
-        mList.clear();
-        for (int i = 0; i < raidaLists.size(); i++) {
-
-            byte[] request = Protocol.GenerateRequest(i, CommandCodes.Echo);
-            makeUdpCall(new UDPCall(request, i, CommandCodes.Echo));
-        }
-
-    }
-
-    public void echo() throws Exception {
-        raidaResponses.clear();
-        String html = null;
-        udpCalls = new ArrayList<>();
-        retry = 0;
-        if (raidaLists == null || raidaLists.size() == 0) {
-            html = getServerList();
-            if (html != null && html.length() > 0)
-                System.out.print(html);
-            raidaLists = createServerList(html);
-        }
-
-        mList.clear();
-        for (int i = 0; i < raidaLists.size(); i++) {
-            byte[] header = generateHeader(i, 0);
-            byte[] body = generateChallenge();
-            byte[] eheader = generateXHeader(i, 4, body.length);
-            byte[] mData = new byte[header.length + body.length];
-
-            byte[] request = new byte[eheader.length + body.length];
-            System.arraycopy(eheader, 0, request, 0, eheader.length);
-            System.arraycopy(body, 0, request, 32, body.length);
-
-            makeUdpCall(new UDPCall(request, i, 4));
-        }
-    }
-
     public void setCallbacks(UDPCallBackInterface callbacks) {
         udpCallbacks = callbacks;
-    }
-
-    public byte[] generateHeader(int raidaID, int type, int udpnum, byte udpChecksum, boolean encryption, byte[] nonce,
-                                 byte[] mSerialNo) {
-        byte[] udpHeader = new byte[32];
-        byte[] serialNo = { (byte) 0, (byte) 0, (byte) 0 };
-        if (nonce == null) {
-            nonce = new byte[] { (byte) 0, (byte) 0, (byte) 0 };
-        }
-        byte mEnc = (byte) 0;
-
-        if (udpnum < 1)
-            udpnum = 1;
-
-        byte[] size = new byte[2];
-        size[0] = (byte) ((udpnum >> 8) & 0xFF);
-        size[1] = (byte) (udpnum & 0xFF);
-
-        byte coinType = 1;
-        if (type == 30 || type == 31)
-            coinType = 0;
-
-        // Log.d("HEADER", "UDP NUM:" + udpnum);
-        if (encryption) {
-            if (!((nonce.equals("null")) || (nonce.length == 0))) {
-
-                if (mSerialNo.length == 3 && nonce.length == 3) {
-                    mEnc = (byte) 1;
-                    serialNo = mSerialNo;
-                }
-
-            }
-        }
-        udpHeader[0] = 1;
-        udpHeader[1] = 0;
-        udpHeader[2] = (byte) raidaID;
-        udpHeader[3] = 0;
-        udpHeader[4] = 0;
-        udpHeader[5] = (byte) type;
-        udpHeader[6] = udpChecksum;
-        udpHeader[7] = 4;
-        udpHeader[8] = 1;
-        udpHeader[9] = 0;
-        udpHeader[10] = 0;
-        udpHeader[11] = 0;
-        udpHeader[12] = 0;
-        udpHeader[13] = 0;
-        udpHeader[14] = 0;
-        udpHeader[15] = 0;
-        udpHeader[16] = mEnc;
-        udpHeader[17] = 0;
-        udpHeader[18] = 0;
-        udpHeader[19] = serialNo[0];
-        udpHeader[20] = serialNo[1];
-        udpHeader[21] = serialNo[2];
-        udpHeader[22] = 0;
-        udpHeader[23] = 0;
-        udpHeader[24] = nonce[0];
-        udpHeader[25] = nonce[1];
-        udpHeader[26] = nonce[2];
-        udpHeader[27] = 0;
-        udpHeader[28] = 0;
-        udpHeader[29] = 0;
-        udpHeader[30] = 0;
-        udpHeader[31] = 0;
-
-        // Log.d("HEADER", bytesToHex(udpHeader));
-
-        return udpHeader;
-    }
-
-    public byte[] generateHeader(int raidaID, int type) {
-        return generateHeader(raidaID, type, 1, (byte) 0, false, null, null);
-    }
-
-    public byte[] generateHeader(int raidaID, int type, int udpnum) {
-        return generateHeader(raidaID, type, udpnum, (byte) 0, false, null, null);
-    }
-
-    public byte[] generateHeader(int raidaID, int type, int udpnum, byte udpChecksum) {
-        return generateHeader(raidaID, type, udpnum, udpChecksum, false, null, null);
     }
 
     private String readFromUnsecuredServer(String url)
