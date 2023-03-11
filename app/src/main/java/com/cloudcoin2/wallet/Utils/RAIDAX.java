@@ -45,7 +45,6 @@ import android.util.Log;
 import com.cloudcoin2.wallet.Model.CloudCoin;
 import com.cloudcoin2.wallet.Model.EchoStatus;
 import com.cloudcoin2.wallet.Model.RaidaItems;
-import com.cloudcoin2.wallet.Model.RaidaResponse;
 import com.cloudcoin2.wallet.Model.SerialAn;
 import com.cloudcoin2.wallet.Model.UDPCall;
 
@@ -69,6 +68,9 @@ public class RAIDAX {
     private int retry = 0, mPassCount = 0, mResponseCount = 0;
     public ArrayList<RaidaResponse> raidaResponses = new ArrayList<>();
     private UDPCallBackInterface udpCallbacks;
+    private EchoResult echoResult = new EchoResult(0, 0);
+    private final Object lock = new Object();
+    private boolean isExecuting = false;
 
     private static final ConnectionPool<DatagramSocket> connectionPool = new ConnectionPool<>(MAX_CONNECTIONS, () -> {
         try {
@@ -109,14 +111,14 @@ public class RAIDAX {
             "https://g24.rsxcover.com/coin4.txt"
     };
 
-    private static RAIDA raida;
+    private static RAIDAX raida;
     private final ArrayList<EchoStatus> mList = new ArrayList<>(25);
 
-    public static RAIDA getInstance() {
+    public static RAIDAX getInstance() {
         if (raida == null) {
-            synchronized (RAIDA.class) {
+            synchronized (RAIDAX.class) {
                 if (raida == null) {
-                    raida = new RAIDA();
+                    raida = new RAIDAX();
                 }
             }
         }
@@ -214,6 +216,28 @@ public class RAIDAX {
         return challengeData;
     }
 
+    public void execute(int commandCode) throws InterruptedException {
+        synchronized (lock) {
+            if (isExecuting) {
+                throw new IllegalStateException("Cannot execute while another command is already running");
+            }
+            isExecuting = true;
+        }
+        try {
+            if (commandCode == CommandCodes.Echo) {
+                try {
+                    doEcho();
+                } catch (Exception e) {
+
+                }
+            }
+        } finally {
+            synchronized (lock) {
+                isExecuting = false;
+            }
+        }
+    }
+
     public void doEcho() throws Exception {
         String html = null;
         udpCalls = new ArrayList<>();
@@ -251,14 +275,33 @@ public class RAIDAX {
                 // Handle any exceptions thrown during the execution of the task
             }
         }
-        for(RaidaResponse response: results) {
-            processResults(response);
-        }
+        // for(RaidaResponse response: results) {
+        // processResults(response);
+        // }
+        processEchoResults(results);
+        connectionPool.closeAllConnections();
 
     }
 
-    public void processResults (RaidaResponse response) {
-        System.out.println("Got Result from :" + response.raidaId + ". \nResponse: " + response.getResponseBody());
+    public void processResults(List<RaidaResponse> results, int commandCode) {
+        if (commandCode == CommandCodes.Echo) {
+            EchoResult echoResult = new EchoResult(0, 0);
+            echoResult.compute(results);
+            this.echoResult = echoResult;
+        }
+    }
+
+    public void processResults(RaidaResponse response) {
+        System.out.println("Got Result from :" + response.raidaId + ". \nResponse: " + response.getResponseHex());
+    }
+
+    public void processEchoResults(List<RaidaResponse> results) {
+        EchoResult echoResult = new EchoResult(0, 0);
+        echoResult.compute(results);
+        System.out.println("Got Total Results:" + echoResult.getResultCount());
+        System.out.println("Got Pass Results:" + echoResult.getPassCount());
+        System.out.println("Got Fail Results:" + echoResult.getFailCount());
+        this.echoResult = echoResult;
     }
 
     public RaidaResponse executeCommand(UDPCall udp) throws InterruptedException {
@@ -697,6 +740,10 @@ public class RAIDAX {
                 "RAIDA" + udp.getIndex() + "Going to error callback with command code " + udp.getCommandCode());
         // udpCallbacks.ReportBackError(e, udp.getData(), udp.getCommandCode(),
         // udp.getIndex());
+    }
+
+    public EchoResult getEchoResult() {
+        return echoResult;
     }
 
 }

@@ -1,8 +1,4 @@
-package com.cloudcoin2.wallet.Model;
-
-import static com.cloudcoin2.wallet.Utils.RAIDA.bytesToHex;
-
-import android.util.Log;
+package com.cloudcoin2.wallet.Utils;
 
 public class RaidaResponse {
 
@@ -20,12 +16,23 @@ public class RaidaResponse {
 
     byte[] responseBody;
 
+    private byte[] response;
+
+
+    public byte[] getResponse() {
+        return this.response;
+    }
+
+    public String getResponseHex() {
+        return Utils.bytesToHex(this.response);
+    }
 
 
     byte[] masterTicket;
 
     public RaidaResponse(byte[] response, int commandCode) {
         this.commandCode = commandCode;
+        this.response = response;
         if(response.length>=12)
         {
             raidaId = response[0];
@@ -121,3 +128,4 @@ public class RaidaResponse {
 
 
 }
+
