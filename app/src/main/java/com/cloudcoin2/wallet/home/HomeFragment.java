@@ -102,7 +102,6 @@ public class HomeFragment extends BaseFragment2 implements UDPCallBackInterface 
     private ArrayList<EchoStatus> mList = new ArrayList<>(25);
     private RecyclerView rvIndicator;
     private LinearLayout llProgress;
-    private ImageView ivRefresh;
     private int coinCount = 0, newCount = 0;
     private int fixTaskCode = 0;
     private boolean isFixing = false;
@@ -153,9 +152,8 @@ public class HomeFragment extends BaseFragment2 implements UDPCallBackInterface 
         rvDenomination.setLayoutManager(new LinearLayoutManager(getActivity(),
                 LinearLayoutManager.HORIZONTAL, true));
         rvIndicator = view.findViewById(R.id.fragment_home_rvIndicator);
+
         llProgress = view.findViewById(R.id.fragment_home_llProgress);
-       // llProgress.setVisibility(View.VISIBLE);
-        ivRefresh = view.findViewById(R.id.home_fragment_refresh);
         int size = ScreeUtils.INSTANCE.getScreenWidth(getBaseActivity()) -
                 getResources().getDimensionPixelSize(R.dimen._220sdp);
         int itemWidth = (size / 25);
@@ -168,42 +166,11 @@ public class HomeFragment extends BaseFragment2 implements UDPCallBackInterface 
             @Override
             public void run() {
                 try {
-                    raidax.execute(CommandCodes.Echo);
-                    EchoResult result = raidax.getEchoResult();
-                    Log.v("RAIDAX", "Pass Count: " +result.getPassCount());
+                    echo();
                 }catch (Exception e) {
                     Log.e("RAIDAX", e.getMessage());
                 }
             }
-        }).start();
-    }
-
-    private void setdata(int itemWidth) {
-       // llProgress.setVisibility(View.VISIBLE);
-
-
-        mhandler = new Handler();
-
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                Looper.prepare();
-                try {
-                    Thread.sleep(200);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-                setupEchoData(itemWidth);
-                mhandler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        mhandler.postDelayed(this, 1000);
-                     //   llProgress.setVisibility(View.GONE);
-
-                    }
-                });
-            }
-
         }).start();
     }
 
@@ -238,58 +205,11 @@ public class HomeFragment extends BaseFragment2 implements UDPCallBackInterface 
 
     }
 
-    private void setupEchoData(int itemWidth) {
-        RAIDA raida = RAIDA.getInstance();
-        String serverlist = raida.getServerList();
-        try {
-            if (Constants.RAIDALISTS.size() > 0) {
-                Constants.RAIDALISTS.clear();
-            }
-            ArrayList<RaidaItems> raidaItemsList = raida.createServerList(serverlist);
-            if (raidaItemsList != null)
-                Constants.RAIDALISTS.addAll(raidaItemsList);
-            else {
-                raidaItemsList = raida.createServerList(serverlist);
-                Constants.RAIDALISTS.addAll(raidaItemsList);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        try {
-            // RAIDA raida=RAIDA.getInstance();
-            ArrayList<RaidaItems> raidalist = Constants.RAIDALISTS;
-            raida.setRaidaList(raidalist);
-           // raida.setDebug(true);
-            raida.setCallbacks(this);
-            raida.echo();
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-    }
-
-
-    public boolean checkSStoragePermission() {
-        //Managing run time permission for camera and external storage .
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            return Environment.isExternalStorageManager();
-        }
-        else{
-            return true;
-        }
-    }
-
     @Override
     protected void initializeBehavior() {
         int size = ScreeUtils.INSTANCE.getScreenWidth(getBaseActivity()) -
                 getResources().getDimensionPixelSize(R.dimen._220sdp);
-        int itemWidth = (size / 25);
-
-            //File path = new File(getBaseActivity().getExternalFilesDir("").toString());
-
             File path = new File(CouldcoinApplication.CloudcoinHome);
-            //String path=getBaseActivity().getExternalFilesDir(null).getAbsolutePath();
             if (path == null) {
                 Log.e("TAGDirectory", "Failed to get External directory");
                 return;
@@ -312,20 +232,9 @@ public class HomeFragment extends BaseFragment2 implements UDPCallBackInterface 
             updateSettingDB(MENU2, "true");
             updateSettingDB(MENU3, "true");
         }
-        setdata(itemWidth);
         mCalculateCoins(0);
 
         setupListeners(false);
-        ivRefresh.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                int size = ScreeUtils.INSTANCE.getScreenWidth(getBaseActivity()) -
-                        getResources().getDimensionPixelSize(R.dimen._220sdp);
-                int itemWidth = (size / 25);
-                setdata(itemWidth);
-                ;
-            }
-        });
         PackageManager pm = getActivity().getPackageManager();
         String pkgName = getActivity().getPackageName();
         PackageInfo pkgInfo = null;
@@ -337,26 +246,6 @@ public class HomeFragment extends BaseFragment2 implements UDPCallBackInterface 
         String ver = pkgInfo.versionName;
         tvVersion.setText("" + ver);
 
-    }
-
-    private void requestPermission() {
-        new AlertDialog.Builder(getBaseActivity())
-                .setTitle("Addition Permission")
-                .setMessage("Android R related Permissions")
-                .setPositiveButton("Allow", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                          takePermission();
-                    }
-                })
-                .setNegativeButton("Deny", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-
-                    }
-                })
-                .setIcon(R.drawable.ic_app_icon)
-                .show();
     }
 
     private void takePermission() {
@@ -1067,6 +956,36 @@ public class HomeFragment extends BaseFragment2 implements UDPCallBackInterface 
 
         Log.d("RAIDA "+raidaID, "RESPONSE:"+hex + " for CMD:" + commandCode);
         // hideProgressDialogWithTitle();
+    }
+
+    private void echo() {
+        try {
+            raidax.execute(CommandCodes.Echo);
+            EchoResult result = raidax.getEchoResult();
+            int i =0;
+            String status  = "failure";
+            for (String res: result.getResponseCodes()) {
+                if(res.equals("FA")) status = "success";
+                else status = "failure";
+                mAdapter.replaceData(new EchoStatus(i,status),i);
+                i++;
+            }
+
+            rvIndicator.post(new Runnable() {
+                @SuppressLint("NotifyDataSetChanged")
+                @Override
+                public void run() {
+                    mAdapter.notifyDataSetChanged();
+                }
+            });
+
+            setupListeners(true);
+
+        }
+        catch (Exception e) {
+
+        }
+
     }
 
     private void handleEchoCallback(String hex, int raidaID) {
