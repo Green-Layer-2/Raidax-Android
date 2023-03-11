@@ -33,12 +33,15 @@ import com.cloudcoin2.wallet.Model.DetectionCoinsModel;
 import com.cloudcoin2.wallet.Model.EchoStatus;
 import com.cloudcoin2.wallet.Model.RaidaItems;
 import com.cloudcoin2.wallet.R;
+import com.cloudcoin2.wallet.Utils.CommandCodes;
 import com.cloudcoin2.wallet.Utils.CommonUtils;
 import com.cloudcoin2.wallet.Utils.Constants;
 import com.cloudcoin2.wallet.Utils.CouldcoinApplication;
+import com.cloudcoin2.wallet.Utils.EchoResult;
 import com.cloudcoin2.wallet.Utils.KotlinUtils;
 import com.cloudcoin2.wallet.Utils.PermissionUtils;
 import com.cloudcoin2.wallet.Utils.RAIDA;
+import com.cloudcoin2.wallet.Utils.RAIDAX;
 import com.cloudcoin2.wallet.Utils.UDPCallBackInterface;
 import com.cloudcoin2.wallet.base.BaseFragment2;
 import com.cloudcoin2.wallet.Utils.ScreeUtils;
@@ -108,7 +111,7 @@ public class HomeFragment extends BaseFragment2 implements UDPCallBackInterface 
     private int totalApiResponseCount = 0, totalApiRequestCount = 0;
     private int echoCount = 0, echoPassCount = 0;
     private int mResponseCount = 0;
-
+    private RAIDAX raidax = RAIDAX.getInstance();
     @Nullable
     public static String getInternalStorageDirectoryPath(Context context) {
         String storageDirectoryPath;
@@ -161,6 +164,18 @@ public class HomeFragment extends BaseFragment2 implements UDPCallBackInterface 
             mAdapter.addData(new EchoStatus(0, "Test"));
         }
         rvIndicator.setAdapter(mAdapter);
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    raidax.execute(CommandCodes.Echo);
+                    EchoResult result = raidax.getEchoResult();
+                    Log.v("RAIDAX", "Pass Count: " +result.getPassCount());
+                }catch (Exception e) {
+                    Log.e("RAIDAX", e.getMessage());
+                }
+            }
+        }).start();
     }
 
     private void setdata(int itemWidth) {
