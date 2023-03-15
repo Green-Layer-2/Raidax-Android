@@ -51,10 +51,10 @@ public class Protocol {
     }
 
 
-    public static byte[] GenerateRequest(int raidaID, int commandCode, String code ) {
+    public static byte[] GenerateRequest(int raidaID, int commandCode, String code, int commandGroup ) {
         if(commandCode == CommandCodes.Echo) {
             byte[] body = generateChallenge();
-            byte[] header = generateXHeader(raidaID, commandCode, body.length);
+            byte[] header = generateXHeader(raidaID, commandCode, body.length, commandGroup);
 
             byte[] request = new byte[header.length + body.length];
             System.arraycopy(header, 0, request, 0, header.length);
@@ -69,7 +69,7 @@ public class Protocol {
             byte[] md5Bytes = Utils.generateMD5Hash(an);
 
             byte[] body = new byte[34];
-            byte[] header = generateXHeader(raidaID, commandCode, body.length);
+            byte[] header = generateXHeader(raidaID, commandCode, body.length, commandGroup);
 
             System.arraycopy(challenge, 0, body,0, 16);
             System.arraycopy(md5Bytes, 0, body,16, 16);
@@ -87,7 +87,7 @@ public class Protocol {
         return null;
     }
 
-    public static byte[] generateXHeader(int raidaID, int coinID, int length) {
+    public static byte[] generateXHeader(int raidaID, int commandCode, int length, int commandGroup) {
 
         byte[] header = new byte[32];
         // Fill in the request data with the echo command
@@ -96,10 +96,10 @@ public class Protocol {
         header[1] = 0x00; // SP - Split ID (not used in this example)
         header[2] = (byte) raidaID; // DA - Data Agent Index (not used in this example)
         header[3] = 0x00; // SH - Shard ID (not used in this example)
-        header[4] = 0x00; // CG - Command Group (Authentication)
-        header[5] = 0x00; // CM - Command (Echo)
+        header[4] = (byte)commandGroup; // CG - Command Group (Authentication)
+        header[5] = (byte)commandCode; // CM - Command (Echo)
         header[6] = 0x00; // ID - Cloud/Coin ID 0 (not used in this example)
-        header[7] = (byte) coinID; // ID - Cloud/Coin ID 1 (not used in this example)
+        header[7] = (byte) 4; // ID - Cloud/Coin ID 1 (not used in this example)
 
         // Fill in the Presentation group
         header[8] = 0x01; // VR - Version of PLS

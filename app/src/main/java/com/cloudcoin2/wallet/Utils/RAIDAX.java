@@ -193,7 +193,7 @@ public class RAIDAX {
         loadServers();
 
         for (int i = 0; i < raidaLists.size(); i++) {
-            byte[] request = Protocol.GenerateRequest(i, CommandCodes.Peek, code);
+            byte[] request = Protocol.GenerateRequest(i, CommandCodes.Peek, code, 8);
             udpCalls.add(new UDPCall(request, i, CommandCodes.Echo));
         }
 
@@ -248,7 +248,8 @@ public class RAIDAX {
         loadServers();
 
         for (int i = 0; i < raidaLists.size(); i++) {
-            byte[] request = Protocol.GenerateRequest(i, CommandCodes.Echo, "");
+            byte[] request = Protocol.GenerateRequest(i, CommandCodes.Echo, "", 0);
+                Log.d("RAIDAX", Utils.bytesToHex(request));
             udpCalls.add(new UDPCall(request, i, CommandCodes.Echo));
         }
 
