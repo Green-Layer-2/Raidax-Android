@@ -24,6 +24,26 @@ public class Utils {
         return buffer.array();
     }
 
+    public static String toHexString( byte[] bytes )
+    {
+        StringBuffer sb = new StringBuffer( bytes.length*2 );
+        for( int i = 0; i < bytes.length; i++ )
+        {
+            sb.append( toHex(bytes[i] >> 4) );
+            sb.append( toHex(bytes[i]) );
+        }
+
+        return sb.toString();
+    }
+
+    private static char toHex(int nibble)
+    {
+        final char[] hexDigit =
+                {
+                        '0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F'
+                };
+        return hexDigit[nibble & 0xF];
+    }
 
     public static byte[] generateCRC32(byte[] data) {
         CRC32 crc = new CRC32();
@@ -43,10 +63,9 @@ public class Utils {
             byte[] hashBytes = md.digest();
             // Return the first 16 bytes of the hash
             return Arrays.copyOfRange(hashBytes, 0, 16);
-        } catch (NoSuchAlgorithmException e) {
+        } catch (Exception e) {
             throw new RuntimeException("Error generating MD5 hash", e);
         }
     }
-
 
 }

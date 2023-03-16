@@ -254,6 +254,7 @@ public class DepositFragment extends BaseFragment2 implements View.OnClickListen
 
     }
 
+
     public void importFromLocker() {
         String lockerCode = txtLockerCode.getText().toString();
 
@@ -270,6 +271,14 @@ public class DepositFragment extends BaseFragment2 implements View.OnClickListen
                 Log.e("Locker", lockerCode);
                 try {
                     raidax.importLockerCode(lockerCode);
+                    getActivity().runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            llProgress.setVisibility(View.GONE);
+                            Toast.makeText(getActivity(), "Locker Import operation completed", Toast.LENGTH_SHORT).show();
+                            // Perform UI-related operations here
+                        }
+                    });
                 }catch (Exception e) {
                     Log.e("Lokcer", e.getMessage());
                     e.printStackTrace();

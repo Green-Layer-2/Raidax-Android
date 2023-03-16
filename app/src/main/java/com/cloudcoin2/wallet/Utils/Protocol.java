@@ -1,8 +1,14 @@
 package com.cloudcoin2.wallet.Utils;
 
+import android.util.Log;
+
+import java.math.BigInteger;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
+import org.apache.commons.codec.binary.Hex;
 
 public class Protocol {
 
@@ -50,6 +56,89 @@ public class Protocol {
         return returnBytes;
     }
 
+    private static String decodeMD5(byte[] md5) {
+        try {
+            MessageDigest messageDigest = MessageDigest.getInstance("MD5");
+            byte[] digest = messageDigest.digest(md5);
+            BigInteger bigInt = new BigInteger(1, digest);
+            String decoded = bigInt.toString(16);
+            while (decoded.length() < 32) {
+                decoded = "0" + decoded;
+            }
+            return decoded;
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+    public byte[][] getLockerIDsFromTransmitCodeq(String code)  {
+        byte[][] ans = new byte[24][];
+        String[] parts = code.split("-");
+        if (parts.length < 2) {
+            return  null;
+        }
+
+        for (int i = 0; i < 24; i++) {
+            String obj = i + parts[0] + "-" + parts[1];
+            byte[] md5 = Utils.generateMD5Hash(code);
+
+            ans[i] = decodeMD5(md5).getBytes();
+
+            ans[i][12] = (byte) 0xff;
+            ans[i][13] = (byte) 0xff;
+            ans[i][14] = (byte) 0xff;
+            ans[i][15] = (byte) 0xff;
+        }
+
+        return ans;
+    }
+
+    public static byte[] getLockerIDForRAIDA(String code, int raidaID) {
+        String obj = raidaID + code;
+        byte[] md5 = Utils.generateMD5Hash(obj);
+        md5[12] = (byte)0xff;
+        md5[13] = (byte)0xff;
+        md5[14] = (byte)0xff;
+        md5[15] = (byte)0xff;
+
+        return md5;
+    }
+
+    public static byte[][] getLockerIDsFromTransmitCode(String code)  {
+        byte[][] ans = new byte[25][];
+        String[] parts = code.split("-");
+        if (parts.length < 2) {
+            return  null;
+        }
+        for (int i = 0; i < 24; i++) {
+            String obj = i + parts[0] + "-" + parts[1];
+            byte[] md5 = Utils.generateMD5Hash(obj);
+            //ans[i] = Hex.decodeHex(Hex.encodeHexString(md5).toCharArray());
+            ans[i]= md5;
+            ans[i][12] = (byte) 0xff;
+            ans[i][13] = (byte) 0xff;
+            ans[i][14] = (byte) 0xff;
+            ans[i][15] = (byte) 0xff;
+        }
+        return ans;
+    }
+
+    private byte[] getMD5(byte[] input) throws NoSuchAlgorithmException {
+        MessageDigest messageDigest = MessageDigest.getInstance("MD5");
+        messageDigest.update(input);
+        return messageDigest.digest();
+    }
+
+    public static byte[] decodeHexString(String hexString) {
+        try {
+            // Convert the hexadecimal string to a byte array
+            byte[] byteArray = Hex.decodeHex(hexString);
+            // Return the resulting byte array
+            return byteArray;
+        } catch (Exception e) {
+            throw new RuntimeException("Error decoding hexadecimal string", e);
+        }
+    }
 
     public static byte[] GenerateRequest(int raidaID, int commandCode, String code, int commandGroup ) {
         if(commandCode == CommandCodes.Echo) {
@@ -65,8 +154,16 @@ public class Protocol {
         if(commandCode == CommandCodes.Peek) {
 
             byte[] challenge = generateChallenge();
-            String an = raidaID + code;
-            byte[] md5Bytes = Utils.generateMD5Hash(an);
+            String an = code;
+
+            byte[] md5Bytes = getLockerIDForRAIDA(an, raidaID);
+            Log.d("RAIDAX-AN", Utils.toHexString(md5Bytes));
+
+//            byte[] hashBytes = decodeHexString(Utils.bytesToHex(md5Bytes));
+//            hashBytes[12] = (byte)0xff;
+//            hashBytes[13] = (byte)0xff;
+//            hashBytes[14] = (byte)0xff;
+//            hashBytes[15] = (byte)0xff;
 
             byte[] body = new byte[34];
             byte[] header = generateXHeader(raidaID, commandCode, body.length, commandGroup);
@@ -78,6 +175,8 @@ public class Protocol {
             body[body.length -2] = 0x3e;
 
             byte[] request = new byte[header.length + body.length];
+            Log.d("RAIDAX-Request", Utils.bytesToHex(body));
+
             System.arraycopy(header, 0, request, 0, header.length);
             System.arraycopy(body, 0, request, 32, body.length);
 
