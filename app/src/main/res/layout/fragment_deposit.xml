@@ -166,7 +166,7 @@
                 android:maxLines="1"
                 android:imeOptions="actionDone"
                 android:singleLine="true"
-                android:text="12D-ZYZG"
+                android:text="1RL-R3Q5"
                 android:paddingStart="@dimen/_25sdp"
                 android:textColor="@color/colorLightGrayishBlue"
                 android:textColorHint="@color/colorLightGrayishBlue"

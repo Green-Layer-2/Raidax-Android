@@ -32,7 +32,6 @@ import android.util.Log;
 import com.cloudcoin2.wallet.Model.RaidaItems;
 import com.cloudcoin2.wallet.Model.UDPCall;
 
-
 public class RAIDAX {
 
     private static final int MAX_CONNECTIONS = 25;
@@ -55,6 +54,8 @@ public class RAIDAX {
     private EchoResult echoResult = new EchoResult(0, 0);
     private final Object lock = new Object();
     private boolean isExecuting = false;
+    private ArrayList<PeekResult> peekResults = new ArrayList<>();
+    public static ArrayList<Denominations> denominations = new ArrayList<>();
 
     private static final ConnectionPool<DatagramSocket> connectionPool = new ConnectionPool<>(MAX_CONNECTIONS, () -> {
         try {
@@ -96,6 +97,26 @@ public class RAIDAX {
     };
 
     private static RAIDAX raida;
+
+    public void RAIDAX() {
+        RAIDAX.denominations.clear();
+        RAIDAX.denominations.add(new Denominations(-8, .00000001));
+        RAIDAX.denominations.add(new Denominations(-7, .0000001));
+        RAIDAX.denominations.add(new Denominations(-6, .000001));
+        RAIDAX.denominations.add(new Denominations(-5, .00001));
+        RAIDAX.denominations.add(new Denominations(-4, .0001));
+        RAIDAX.denominations.add(new Denominations(-3, .001));
+        RAIDAX.denominations.add(new Denominations(-2, .01));
+        RAIDAX.denominations.add(new Denominations(-1, .1));
+        RAIDAX.denominations.add(new Denominations(0, 1));
+        RAIDAX.denominations.add(new Denominations(1, 10));
+        RAIDAX.denominations.add(new Denominations(2, 100));
+        RAIDAX.denominations.add(new Denominations(3, 1000));
+        RAIDAX.denominations.add(new Denominations(4, 10000));
+        RAIDAX.denominations.add(new Denominations(5, 100000));
+        RAIDAX.denominations.add(new Denominations(6, 1000000));
+        RAIDAX.denominations.add(new Denominations(7, 10000000));
+    }
 
     public static RAIDAX getInstance() {
         if (raida == null) {
@@ -174,14 +195,12 @@ public class RAIDAX {
             String html = null;
             udpCalls = new ArrayList<>();
             retry = 0;
-            byte[] Separator = "3E3E".getBytes();
             if (raidaLists == null || raidaLists.size() == 0) {
                 html = getServerList();
                 if (html != null && html.length() > 0)
                     Log.d("RAIDA", html);
                 raidaLists = createServerList(html);
             }
-
         }catch (Exception e) {
 
         }
@@ -217,7 +236,11 @@ public class RAIDAX {
                 // Handle any exceptions thrown during the execution of the task
             }
         }
-        processPeekResults(results);
+        int successCount = processPeekResults(results);
+        if(successCount == 25) {
+            Log.d("RAIDAX", "Starting Pown");
+        }
+
         connectionPool.releaseAllConnections();
 
 
@@ -294,12 +317,35 @@ public class RAIDAX {
         this.echoResult = echoResult;
     }
 
-    public void processPeekResults(List<RaidaResponse> results) {
+    public static byte[] extractPeekData(byte[] input) {
+        if (input.length < 34) {
+            throw new IllegalArgumentException("Input array must be at least 34 bytes long.");
+        }
+        byte[] output = Arrays.copyOfRange(input, 32, input.length - 2);
+        return output;
+    }
 
+    public int processPeekResults(List<RaidaResponse> results) {
+        int passCount = 0;
+        int i =0;
+        peekResults.clear();
         for (RaidaResponse result:
              results) {
+            String resultCode = Utils.bytesToHex(result.getResponse()).substring(4,6);
+            PeekResult peekResult = new PeekResult();
+            peekResult.setData(extractPeekData(result.getResponse()));
+            peekResults.add(peekResult);
+            for (Coin coin:
+                 peekResult.coins) {
+                Log.d("RAIDAX", "DN:" + coin.getDenomination() + ", SN:" + coin.getSN());
+            }
+            if(resultCode.equals("F1")) passCount++;
             Log.d("RAIDAX", Utils.bytesToHex(result.getResponse()));
+            Log.d("RAIDAX","Code:" + resultCode );
+            i++;
         }
+        Log.d("RAIDAX","Pass Count:" + passCount );
+        return  passCount;
     }
 
 
@@ -323,12 +369,13 @@ public class RAIDAX {
             ds.setSoTimeout(UDP_CONNECTION_TIMEOUT);
 
             try {
-                byte[] realData = null;
-                DatagramPacket rdp;
-                rdp = new DatagramPacket(new byte[udp.getData().length], udp.getData().length);
+                int bufferSize = 8192; // Use a large enough buffer to accommodate the largest expected response
+                DatagramPacket rdp = new DatagramPacket(new byte[bufferSize], bufferSize);
 
                 ds.receive(rdp);
-                realData = Arrays.copyOf(rdp.getData(), rdp.getLength());
+                int responseSize = rdp.getLength(); // Determine the actual size of the response
+
+                byte[] realData = Arrays.copyOf(rdp.getData(), responseSize); // Create a new array with the correct size
                 RaidaResponse response = new RaidaResponse(realData, udp.getCommandCode());
                 ds.close();
                 return response;

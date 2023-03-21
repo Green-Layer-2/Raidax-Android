@@ -5,19 +5,13 @@ public class RaidaResponse {
     byte raidaId;
     byte shardId;
     byte status;
-
-
-
     int commandCode;
     byte executionTime;
     byte[] frameCount;
     byte[] clientEcho;
     byte[] challengeHash;
-
     byte[] responseBody;
-
     private byte[] response;
-
 
     public byte[] getResponse() {
         return this.response;

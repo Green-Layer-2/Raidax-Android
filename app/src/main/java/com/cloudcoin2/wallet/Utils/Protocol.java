@@ -157,13 +157,6 @@ public class Protocol {
             String an = code;
 
             byte[] md5Bytes = getLockerIDForRAIDA(an, raidaID);
-            Log.d("RAIDAX-AN", Utils.toHexString(md5Bytes));
-
-//            byte[] hashBytes = decodeHexString(Utils.bytesToHex(md5Bytes));
-//            hashBytes[12] = (byte)0xff;
-//            hashBytes[13] = (byte)0xff;
-//            hashBytes[14] = (byte)0xff;
-//            hashBytes[15] = (byte)0xff;
 
             byte[] body = new byte[34];
             byte[] header = generateXHeader(raidaID, commandCode, body.length, commandGroup);
