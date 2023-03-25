@@ -35,6 +35,7 @@ import com.cloudcoin2.wallet.Model.EchoStatus;
 import com.cloudcoin2.wallet.Model.IncomeFile;
 import com.cloudcoin2.wallet.Model.RaidaItems;
 import com.cloudcoin2.wallet.R;
+import com.cloudcoin2.wallet.Utils.CloudCoinFileWriter;
 import com.cloudcoin2.wallet.Utils.CommandCodes;
 import com.cloudcoin2.wallet.Utils.CommonUtils;
 import com.cloudcoin2.wallet.Utils.Constants;
@@ -271,7 +272,10 @@ public class DepositFragment extends BaseFragment2 implements View.OnClickListen
                 Log.e("Locker", lockerCode);
                 try {
                     raidax.importLockerCode(lockerCode);
-
+                    for (CloudCoin cc:
+                         RAIDAX.peekCloudCoins) {
+                        CloudCoinFileWriter.WriteCoinToFile(cc,9, bankDirPath);
+                    }
                     getActivity().runOnUiThread(new Runnable() {
                         @Override
                         public void run() {

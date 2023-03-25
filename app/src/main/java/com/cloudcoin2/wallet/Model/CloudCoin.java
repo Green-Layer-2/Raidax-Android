@@ -25,8 +25,39 @@ public class CloudCoin {
     private int passCount = 0;
     private int failCount = 0;
     private int noResponseCount = 25;
+    private String pownString;
+
+    public void setPownString(String pownString) { this.pownString= pownString;}
+
+    public byte[] toByteArray(int format) {
+        if(format == 9) return  toByteArrayFormat9();
+
+        return  null;
+    }
 
 
+    public byte[] toByteArrayFormat9() {
+        int ansLength = 0;
+        for (byte[] an : ans) {
+            ansLength += an.length;
+        }
+
+        byte[] byteArray = new byte[1 + serial.length + ansLength];
+        int currentIndex = 0;
+
+        byteArray[currentIndex] = denomination;
+        currentIndex += 1;
+
+        System.arraycopy(serial, 0, byteArray, currentIndex, serial.length);
+        currentIndex += serial.length;
+
+        for (byte[] an : ans) {
+            System.arraycopy(an, 0, byteArray, currentIndex, an.length);
+            currentIndex += an.length;
+        }
+
+        return byteArray;
+    }
 
     private int coinType=0; // 0 = bank 1=fracked  2 = counterfeit 3 = limbo
 
@@ -51,7 +82,7 @@ public class CloudCoin {
     public CloudCoin(Coin coin) {
         this.denomination = (byte) coin.getDenomination();
         this.serial = intToByteArray(coin.getSN());
-
+        this.pownString = "ppppppppppppppppppppppppp";
         this.ans = new byte[25][];
         for (int i = 0; i < RAIDAX.NUM_SERVERS; i++) {
             ans[i] = generateRandomAN(16);
@@ -183,6 +214,22 @@ public class CloudCoin {
         else return (byte) -1;
     }
 
+    public String generateSingleCoinFileName(String extension) {
+        // Convert denomination byte to an integer
+        int btc = denomination & 0xFF;
+
+        // Convert serial bytes to an integer (assuming the serial number is stored in big-endian order)
+        int serialNumber = ByteBuffer.wrap(serial).getInt();
+
+        // Calculate the satoshies
+        int sat = (int) (Math.pow(2, denomination) * 1000);
+
+        String denominationWhole = String.valueOf(btc);
+        String satoshiesFraction = String.format("%09d", sat);
+
+        String fileName = denominationWhole + " BTC " + satoshiesFraction + " SAT." + pownString + "." + serialNumber + "." + extension;
+        return fileName;
+    }
     public boolean  isFracked()
     {
         return this.passCount >= 16 && this.failCount >= 1;
