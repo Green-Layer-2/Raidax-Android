@@ -897,6 +897,13 @@ public class RAIDA {
         return returnBytes;
     }
 
+    public static byte[] generateRandomAN(int length) {
+        SecureRandom random = new SecureRandom();
+        byte[] random_AN = new byte[length];
+        random.nextBytes(random_AN);
+        return random_AN;
+    }
+
     public List<CloudCoin> fixDebugCoins(List<CloudCoin> coins) {
         return fixDebugCoins(coins, null);
     }

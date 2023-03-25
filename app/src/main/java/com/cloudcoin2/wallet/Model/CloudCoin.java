@@ -2,7 +2,11 @@ package com.cloudcoin2.wallet.Model;
 
 import static com.cloudcoin2.wallet.Utils.RAIDA.bytesToHex;
 
+import com.cloudcoin2.wallet.Utils.Coin;
+import com.cloudcoin2.wallet.Utils.RAIDAX;
+
 import java.nio.ByteBuffer;
+import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,6 +37,42 @@ public class CloudCoin {
     private List<Integer> frackedServers= new ArrayList();
     List<List<CloudCoin>> frackedCoins = new ArrayList<>();
 
+    public CloudCoin(int dn,int serial) {
+        this.denomination = (byte) dn;
+        this.serial = intToByteArray(serial);
+        this.ans = new byte[25][];
+        for (int i = 0; i < RAIDAX.NUM_SERVERS; i++) {
+            ans[i] = generateRandomAN(16);
+        }
+
+    }
+
+
+    public CloudCoin(Coin coin) {
+        this.denomination = (byte) coin.getDenomination();
+        this.serial = intToByteArray(coin.getSN());
+
+        this.ans = new byte[25][];
+        for (int i = 0; i < RAIDAX.NUM_SERVERS; i++) {
+            ans[i] = generateRandomAN(16);
+        }
+
+    }
+
+    public void generateANs() {
+        for (int i = 0; i < RAIDAX.NUM_SERVERS; i++) {
+
+        }
+    }
+
+    public  byte[] intToByteArray(int value) {
+        return new byte[] {
+                (byte) (value >> 24),
+                (byte) (value >> 16),
+                (byte) (value >> 8),
+                (byte) value
+        };
+    }
 
     public CloudCoin(byte[] serial, byte[][] ans, byte[][] pans) {
 
@@ -72,6 +112,15 @@ public class CloudCoin {
     public byte[] getSerial() {
         return serial;
     }
+
+    public int getSerialAsInt() {
+        return ((serial[0] & 0xFF) << 24) |
+                ((serial[1] & 0xFF) << 16) |
+                ((serial[2] & 0xFF) << 8) |
+                ((serial[3] & 0xFF) << 0);
+    }
+
+
 
     public void setSerial(byte[] serial) {
         this.serial = serial;
@@ -147,6 +196,14 @@ public class CloudCoin {
         }
 
     }
+
+    public static byte[] generateRandomAN(int length) {
+        SecureRandom random = new SecureRandom();
+        byte[] random_AN = new byte[length];
+        random.nextBytes(random_AN);
+        return random_AN;
+    }
+
     private void recalculateCounts()
     {
         passCount=0;

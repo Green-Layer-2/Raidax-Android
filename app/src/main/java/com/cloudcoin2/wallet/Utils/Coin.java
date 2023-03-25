@@ -15,4 +15,24 @@ public class Coin {
                 ((data[3] & 0xFF) << 8) |
                 ((data[4] & 0xFF) << 0);
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
+        }
+        Coin other = (Coin) obj;
+        return dn == other.dn && sn == other.sn;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = 17;
+        result = 31 * result + dn;
+        result = 31 * result + sn;
+        return result;
+    }
 }

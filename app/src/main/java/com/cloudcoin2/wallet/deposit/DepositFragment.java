@@ -271,6 +271,7 @@ public class DepositFragment extends BaseFragment2 implements View.OnClickListen
                 Log.e("Locker", lockerCode);
                 try {
                     raidax.importLockerCode(lockerCode);
+
                     getActivity().runOnUiThread(new Runnable() {
                         @Override
                         public void run() {

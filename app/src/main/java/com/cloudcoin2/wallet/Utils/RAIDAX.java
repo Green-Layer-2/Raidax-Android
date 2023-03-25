@@ -29,11 +29,13 @@ import java.util.concurrent.*;
 
 import android.util.Log;
 
+import com.cloudcoin2.wallet.Model.CloudCoin;
 import com.cloudcoin2.wallet.Model.RaidaItems;
 import com.cloudcoin2.wallet.Model.UDPCall;
 
 public class RAIDAX {
 
+    public static final int NUM_SERVERS = 25;
     private static final int MAX_CONNECTIONS = 25;
     private String SERVER_URL = "https://g1.raida-guardian-tx.us/coin4.txt";
 
@@ -56,6 +58,10 @@ public class RAIDAX {
     private boolean isExecuting = false;
     private ArrayList<PeekResult> peekResults = new ArrayList<>();
     public static ArrayList<Denominations> denominations = new ArrayList<>();
+    public static ArrayList<String> peekSNs = new ArrayList<>();
+    public static ArrayList<CloudCoin> peekCloudCoins = new ArrayList<>();
+
+    public static String TAG = "RAIDAX";
 
     private static final ConnectionPool<DatagramSocket> connectionPool = new ConnectionPool<>(MAX_CONNECTIONS, () -> {
         try {
@@ -208,6 +214,14 @@ public class RAIDAX {
 
     }
 
+    public static byte[] generateRandomAN(int length) {
+        SecureRandom random = new SecureRandom();
+        byte[] random_AN = new byte[length];
+        random.nextBytes(random_AN);
+        return random_AN;
+    }
+
+
     public void importLockerCode(String code) throws Exception {
         loadServers();
 
@@ -241,8 +255,12 @@ public class RAIDAX {
             Log.d("RAIDAX", "Starting Pown");
         }
 
-        connectionPool.releaseAllConnections();
+        for (CloudCoin cc:
+             RAIDAX.peekCloudCoins) {
+            Log.d(RAIDAX.TAG, "Coin: SN-" + cc.getDenomination() + ", SN:" + cc.getSerialAsInt() + Utils.bytesToHex(cc.getAns()[0]));
+        }
 
+        connectionPool.releaseAllConnections();
 
     }
 
@@ -329,6 +347,8 @@ public class RAIDAX {
         int passCount = 0;
         int i =0;
         peekResults.clear();
+        ArrayList<String> sns = new ArrayList<>();
+        ArrayList<Coin> pcoins = new ArrayList<>();
         for (RaidaResponse result:
              results) {
             String resultCode = Utils.bytesToHex(result.getResponse()).substring(4,6);
@@ -338,13 +358,25 @@ public class RAIDAX {
             for (Coin coin:
                  peekResult.coins) {
                 Log.d("RAIDAX", "DN:" + coin.getDenomination() + ", SN:" + coin.getSN());
+                if(!pcoins.contains(coin)) pcoins.add(coin);
+                if(!sns.contains(coin.getDenomination() + "-" + coin.getSN())) sns.add(coin.getDenomination() + "-" + coin.getSN());
             }
             if(resultCode.equals("F1")) passCount++;
             Log.d("RAIDAX", Utils.bytesToHex(result.getResponse()));
             Log.d("RAIDAX","Code:" + resultCode );
             i++;
         }
-        Log.d("RAIDAX","Pass Count:" + passCount );
+        for (int j = 0; j < sns.size(); j++) {
+            Log.d("RAIDAX--", sns.get(j));
+        }
+
+        RAIDAX.peekCloudCoins.clear();
+        for (Coin pcoin:
+             pcoins) {
+            RAIDAX.peekCloudCoins.add(new CloudCoin(pcoin));
+        }
+
+        Log.d("RAIDAX","Pass Count:" + passCount + "Coin List size:" + pcoins.size() );
         return  passCount;
     }
 
@@ -391,9 +423,7 @@ public class RAIDAX {
                     RaidaResponse errorResponse = new RaidaResponse(e.getMessage().getBytes(), udp.getCommandCode());
                     return errorResponse;
                 }
-
             }
-
         } catch (Exception e) {
             RaidaResponse errorResponse = new RaidaResponse(e.getMessage().getBytes(), udp.getCommandCode());
             return errorResponse;
