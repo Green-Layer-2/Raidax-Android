@@ -44,6 +44,7 @@ import com.cloudcoin2.wallet.Utils.EchoResult;
 import com.cloudcoin2.wallet.Utils.KotlinUtils;
 import com.cloudcoin2.wallet.Utils.RAIDA;
 import com.cloudcoin2.wallet.Utils.RAIDAX;
+import com.cloudcoin2.wallet.Utils.RaidaResponse;
 import com.cloudcoin2.wallet.Utils.ScreeUtils;
 import com.cloudcoin2.wallet.Utils.UDPCallBackInterface;
 import com.cloudcoin2.wallet.base.BaseFragment2;
@@ -129,7 +130,7 @@ public class DepositFragment extends BaseFragment2 implements View.OnClickListen
     ConstraintLayout layout;
     RAIDA raida = RAIDA.getInstance();
 
-    private String bankDirPath, limboDirPath, counterfeitPath, importPath, frackedDirPath, trashPath;
+    public static String bankDirPath, limboDirPath, counterfeitPath, importPath, frackedDirPath, trashPath;
     final static int REQUEST_CODE_IMPORT_DIR = 1;
 
     @Override
@@ -272,10 +273,23 @@ public class DepositFragment extends BaseFragment2 implements View.OnClickListen
                 Log.e("Locker", lockerCode);
                 try {
                     raidax.importLockerCode(lockerCode);
-                    for (CloudCoin cc:
-                         RAIDAX.peekCloudCoins) {
-                        CloudCoinFileWriter.WriteCoinToFile(cc,9, bankDirPath);
+                    int k =0 ;
+                    String pathSeparator = System.getProperty("file.separator");
+
+                    File newDirectory = new File(Environment.getExternalStorageDirectory().toString(), "CloudCoins");
+                    //if(!newDirectory.exists())
+                        newDirectory.mkdirs();
+
+                    String folder = Environment.getExternalStorageDirectory().toString() + pathSeparator + "CloudCoins";
+                    Log.d(RAIDAX.TAG,folder);
+                    for (RaidaResponse response:
+                         RAIDAX.getInstance().raidaResponses) {
+                        String targetFolder = "";
+
+                        Log.d(RAIDAX.TAG,"Writing Response for Raida-" + k + "-" + response.getResponseHex() );
+                        CloudCoinFileWriter.WriteBytesToFile(response.getResponse(), folder + pathSeparator + "response" + k++ + ".bin"  );
                     }
+
                     getActivity().runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
@@ -329,7 +343,6 @@ public class DepositFragment extends BaseFragment2 implements View.OnClickListen
                 llProgress.setVisibility(View.GONE);
             }
         });
-
 
     }
 

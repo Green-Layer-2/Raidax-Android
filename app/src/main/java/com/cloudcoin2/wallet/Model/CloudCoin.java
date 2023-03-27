@@ -27,7 +27,21 @@ public class CloudCoin {
     private int noResponseCount = 25;
     private String pownString;
 
-    public void setPownString(String pownString) { this.pownString= pownString;}
+    public void setPownString(String pownString) {
+        this.pownString= pownString;
+        if(pownString.equals("ppppppppppppppppppppppppp")) {
+            targetFolder = "Bank";
+        } else if (pownString.equals("fffffffffffffffffffffffff")) {
+            targetFolder = "Counterfeit";
+        }
+
+    }
+
+    private String targetFolder;
+
+    public String getTargetFolder() { return  targetFolder;}
+
+    public void setTargetFolder(String targetFolder) { this.targetFolder = targetFolder;}
 
     public byte[] toByteArray(int format) {
         if(format == 9) return  toByteArrayFormat9();
@@ -83,9 +97,12 @@ public class CloudCoin {
         this.denomination = (byte) coin.getDenomination();
         this.serial = intToByteArray(coin.getSN());
         this.pownString = "ppppppppppppppppppppppppp";
-        this.ans = new byte[25][];
+        this.ans = new byte[RAIDAX.NUM_SERVERS][];
+        this.pans = new byte[RAIDAX.NUM_SERVERS][];
+
         for (int i = 0; i < RAIDAX.NUM_SERVERS; i++) {
             ans[i] = generateRandomAN(16);
+            pans[i] = ans[i];
         }
 
     }
@@ -247,10 +264,17 @@ public class CloudCoin {
     public static byte[] generateRandomAN(int length) {
         SecureRandom random = new SecureRandom();
         byte[] random_AN = new byte[length];
-        random.nextBytes(random_AN);
+
+        for (int i = 0; i < length; i++) {
+            byte randomByte;
+            do {
+                randomByte = (byte) random.nextInt(256);
+            } while (randomByte == 0);
+            random_AN[i] = randomByte;
+        }
+
         return random_AN;
     }
-
     private void recalculateCounts()
     {
         passCount=0;

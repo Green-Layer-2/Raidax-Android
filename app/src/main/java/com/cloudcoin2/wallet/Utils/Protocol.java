@@ -2,6 +2,8 @@ package com.cloudcoin2.wallet.Utils;
 
 import android.util.Log;
 
+import com.cloudcoin2.wallet.Model.CloudCoin;
+
 import java.math.BigInteger;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
@@ -174,6 +176,46 @@ public class Protocol {
             System.arraycopy(body, 0, request, 32, body.length);
 
             return request;
+
+        }
+        if(commandCode == CommandCodes.RemoveLocker) {
+            byte[] challenge = generateChallenge();
+            String an = code;
+
+            byte[] md5Bytes = getLockerIDForRAIDA(an, raidaID);
+
+            byte[] body = new byte[32 + (21* RAIDAX.peekCloudCoins.size()) + 2];
+
+            System.arraycopy(challenge, 0, body,0, 16);
+            System.arraycopy(md5Bytes, 0, body,16, 16);
+
+
+            int i = 0;
+            for (CloudCoin cc:
+                 RAIDAX.peekCloudCoins) {
+                byte[] coinbytes = new byte[21];
+                coinbytes[0] = cc.getDenomination();
+                coinbytes[1] = cc.getSerial()[0];
+                coinbytes[2] = cc.getSerial()[1];
+                coinbytes[3] = cc.getSerial()[2];
+                coinbytes[4] = cc.getSerial()[3];
+
+                System.arraycopy(cc.getPans()[raidaID], 0, coinbytes,5, 16);
+                System.arraycopy(coinbytes, 0, body,5 + (21*i), 16);
+                i++;
+            }
+            body[body.length -1] = 0x3e;
+            body[body.length -2] = 0x3e;
+            byte[] header = generateXHeader(raidaID, commandCode, body.length, commandGroup);
+
+            byte[] request = new byte[header.length + body.length];
+            Log.d("RAIDAX-Request", Utils.bytesToHex(body));
+
+            System.arraycopy(header, 0, request, 0, header.length);
+            System.arraycopy(body, 0, request, 32, body.length);
+
+            return request;
+
 
         }
         return null;

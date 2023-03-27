@@ -5,6 +5,7 @@ import android.util.Log;
 
 import com.cloudcoin2.wallet.Model.CloudCoin;
 
+import java.io.File;
 import java.io.FileOutputStream;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
@@ -14,6 +15,19 @@ import java.io.IOException;
 
 public class CloudCoinFileWriter {
 
+    public static boolean WriteBytesToFile(byte[] data, String path) {
+        try {
+            FileOutputStream fos = new FileOutputStream(path);
+            fos.write(data);
+            fos.close();
+
+        } catch (Exception e) {
+            Log.d(RAIDAX.TAG, e.getMessage() + path);
+            return false;
+        }
+        return true;
+    }
+
     public static boolean WriteCoinToFile(CloudCoin cc, int format, String path) {
         try {
             String pathSeparator = System.getProperty("file.separator");
@@ -21,9 +35,11 @@ public class CloudCoinFileWriter {
             String fileName = path + pathSeparator + cc.generateSingleCoinFileName(".bin");
             Log.d(RAIDAX.TAG, "Writing coin to " + fileName);
             String fmt = "";
-            if(format == 9) fmt = "9";
+            if (format == 9)
+                fmt = "9";
             byte[] header = generateHeader(fmt, 1, 1, 0, 1, null, (byte) 0, "");
-            byte[] cloudCoinData = cc.toByteArray(9); // Assuming there is a method in CloudCoin class to convert the object to a byte array
+            byte[] cloudCoinData = cc.toByteArray(9); // Assuming there is a method in CloudCoin class to convert the
+                                                      // object to a byte array
 
             // Concatenate header and cloudCoinData
             byte[] combinedData = new byte[header.length + cloudCoinData.length];
@@ -39,12 +55,22 @@ public class CloudCoinFileWriter {
             } catch (IOException e) {
                 e.printStackTrace();
             }
+
+            File file = new File(fileName);
+
+            if (file.exists() && file.isFile()) {
+                Log.d(RAIDAX.TAG, "File Size:" + file.length());
+            }
+
             return true;
         } catch (Exception e) {
             e.printStackTrace();
             return false;
-        }    }
-    public static byte[] generateHeader(String format, int cloudID, int coinId, int encType, int coinCount, byte[] md5Hash, byte flags, String receipt) {
+        }
+    }
+
+    public static byte[] generateHeader(String format, int cloudID, int coinId, int encType, int coinCount,
+            byte[] md5Hash, byte flags, String receipt) {
         byte[] header = new byte[32];
 
         header[0] = (byte) format.charAt(0);
@@ -53,7 +79,7 @@ public class CloudCoinFileWriter {
         byte[] coinIdBytes = ByteBuffer.allocate(2).putShort((short) coinId).array();
         System.arraycopy(coinIdBytes, 0, header, 2, 2);
 
-        byte[] encTypeByte = {(byte) encType};
+        byte[] encTypeByte = { (byte) encType };
         System.arraycopy(encTypeByte, 0, header, 4, 1);
 
         byte[] coinCountBytes = ByteBuffer.allocate(2).putShort((short) coinCount).array();
