@@ -61,7 +61,6 @@ public class RAIDAX {
     private boolean isExecuting = false;
     private ArrayList<PeekResult> peekResults = new ArrayList<>();
     public static ArrayList<Denominations> denominations = new ArrayList<>();
-    public static ArrayList<String> peekSNs = new ArrayList<>();
     public static ArrayList<CloudCoin> peekCloudCoins = new ArrayList<>();
     public char[][] peekResultCodes = new char[RAIDAX.NUM_SERVERS][];
     public static boolean peekAllPassed = false;
@@ -234,6 +233,35 @@ public class RAIDAX {
 
     }
 
+    public void removeFromLocker() throws Exception{
+        for (int i = 0; i < raidaLists.size(); i++) {
+            byte[] request = Protocol.GenerateRequest(i, CommandCodes.RemoveLocker, "", CommandGroups.Locker);
+            udpCalls.add(new UDPCall(request, i, CommandCodes.Peek));
+        }
+
+        ExecutorService executorService = Executors.newCachedThreadPool();
+        List<Future<RaidaResponse>> futures = new ArrayList<>();
+
+        // Assuming you have a list of UDPCall objects called udpCalls
+//        for (UDPCall udpCall : udpCalls) {
+//            Future<RaidaResponse> future = executorService.submit(() -> executeCommand(udpCall));
+//            futures.add(future);
+//        }
+//
+//        executorService.shutdown();
+//        executorService.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
+//
+//        ArrayList<RaidaResponse> results = new ArrayList<>();
+//        for (Future<RaidaResponse> future : futures) {
+//            try {
+//                results.add(future.get());
+//            } catch (ExecutionException e) {
+//                // Handle any exceptions thrown during the execution of the task
+//            }
+//        }
+
+    }
+
     public static byte[] generateRandomAN(int length) {
         SecureRandom random = new SecureRandom();
         byte[] random_AN = new byte[length];
@@ -277,30 +305,7 @@ public class RAIDAX {
             Log.d("RAIDAX", "Starting Pown");
         }
 
-        Protocol.GenerateRequest(0, CommandCodes.RemoveLocker, "", CommandGroups.Locker);
-        if (RAIDAX.peekAllPassed) {
-            for (CloudCoin cc : RAIDAX.peekCloudCoins) {
-                if(cc.getTargetFolder().equals("Bank")) {
-                    CloudCoinFileWriter.WriteCoinToFile(cc, 9, DepositFragment.bankDirPath);
-                    Log.d(RAIDAX.TAG, "Wrote to " + DepositFragment.bankDirPath);
-                }
-                if(cc.getTargetFolder().equals("Counterfeit")) {
-                    CloudCoinFileWriter.WriteCoinToFile(cc, 9, DepositFragment.counterfeitPath);
-                    Log.d(RAIDAX.TAG, "Wrote to " + DepositFragment.counterfeitPath);
-                }
-
-            }
-        } else {
-            Log.d(RAIDAX.TAG, "Not All coins passed.");
-        }
-
         udpCalls.clear();
-
-        for (int i = 0; i < raidaLists.size(); i++) {
-            byte[] request = Protocol.GenerateRequest(i, CommandCodes.RemoveLocker, code, CommandGroups.Locker);
-            udpCalls.add(new UDPCall(request, i, CommandCodes.RemoveLocker));
-        }
-
         connectionPool.releaseAllConnections();
 
     }
@@ -389,7 +394,7 @@ public class RAIDAX {
         int i = 0;
         peekAllPassed = false;
         peekResults.clear();
-        ArrayList<String> sns = new ArrayList<>();
+
         ArrayList<Coin> pcoins = new ArrayList<>();
         resetPeekResultCodes();
         for (RaidaResponse result : results) {
@@ -401,8 +406,7 @@ public class RAIDAX {
                 Log.d("RAIDAX", "DN:" + coin.getDenomination() + ", SN:" + coin.getSN());
                 if (!pcoins.contains(coin))
                     pcoins.add(coin);
-                if (!sns.contains(coin.getDenomination() + "-" + coin.getSN()))
-                    sns.add(coin.getDenomination() + "-" + coin.getSN());
+
             }
             if (resultCode.equals("F1"))
                 passCount++;
@@ -444,12 +448,6 @@ public class RAIDAX {
             i++;
             Log.d(RAIDAX.TAG, "Pown String for " + i + ":" + sb);
         }
-
-
-        for (int j = 0; j < sns.size(); j++) {
-            Log.d("RAIDAX--", sns.get(j));
-        }
-
 
         Log.d("RAIDAX", "Pass Count:" + passCount + "Coin List size:" + pcoins.size());
         return passCount;

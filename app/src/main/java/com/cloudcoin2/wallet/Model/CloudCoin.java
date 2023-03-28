@@ -56,8 +56,10 @@ public class CloudCoin {
             ansLength += an.length;
         }
 
-        byte[] byteArray = new byte[1 + serial.length + ansLength];
+        byte[] byteArray = new byte[1 + 1 +1 + serial.length + ansLength];
         int currentIndex = 0;
+        byteArray[currentIndex++] = 1;
+        byteArray[currentIndex++] = 1;
 
         byteArray[currentIndex] = denomination;
         currentIndex += 1;

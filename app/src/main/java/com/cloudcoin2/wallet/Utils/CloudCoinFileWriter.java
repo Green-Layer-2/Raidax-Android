@@ -4,6 +4,7 @@ import android.system.Os;
 import android.util.Log;
 
 import com.cloudcoin2.wallet.Model.CloudCoin;
+import com.cloudcoin2.wallet.deposit.DepositFragment;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -16,15 +17,30 @@ import java.io.IOException;
 public class CloudCoinFileWriter {
 
     public static boolean WriteBytesToFile(byte[] data, String path) {
+        File file = null;
+        if (DepositFragment.sdcard != null) {
+            file = new File(DepositFragment.sdcard, path);
+        }
         try {
-            FileOutputStream fos = new FileOutputStream(path);
+            FileOutputStream fos = new FileOutputStream(file);
             fos.write(data);
             fos.close();
+            Log.d(RAIDAX.TAG,"Wrote response to "+ path);
 
-        } catch (Exception e) {
-            Log.d(RAIDAX.TAG, e.getMessage() + path);
+        } catch (IOException e) {
+            e.printStackTrace();
             return false;
         }
+
+//        try {
+//            FileOutputStream fos = new FileOutputStream(path);
+//            fos.write(data);
+//            fos.close();
+//            Log.d(RAIDAX.TAG,"Wrote response to "+ path);
+//        } catch (Exception e) {
+//            Log.d(RAIDAX.TAG, e.getMessage() + path);
+//            return false;
+//        }
         return true;
     }
 

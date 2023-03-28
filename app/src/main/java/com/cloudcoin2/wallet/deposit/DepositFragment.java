@@ -94,6 +94,8 @@ public class DepositFragment extends BaseFragment2 implements View.OnClickListen
     private ImageView ivBack;
     private ImageView ivRefresh;
     static String BANK_DIR_NAME = "Bank";
+    static String PREDETECT_DIR_NAME = "Predetect";
+
     static String BANK_LIMBO_NAME = "Limbo";
     static String COUNTERFEIT_DIR_NAME = "Counterfeit";
     static String FRACKED_DIR_NAME = "Fracked";
@@ -130,7 +132,9 @@ public class DepositFragment extends BaseFragment2 implements View.OnClickListen
     ConstraintLayout layout;
     RAIDA raida = RAIDA.getInstance();
 
-    public static String bankDirPath, limboDirPath, counterfeitPath, importPath, frackedDirPath, trashPath;
+    public static File sdcard = null;
+
+    public static String bankDirPath, limboDirPath, counterfeitPath, importPath, frackedDirPath, trashPath, predetectPath;
     final static int REQUEST_CODE_IMPORT_DIR = 1;
 
     @Override
@@ -182,6 +186,7 @@ public class DepositFragment extends BaseFragment2 implements View.OnClickListen
         }
 
         bankDirPath = CommonUtils.createDirectory(path, BANK_DIR_NAME, DIR_BASE);
+        predetectPath = CommonUtils.createDirectory(path, PREDETECT_DIR_NAME, DIR_BASE);
         limboDirPath = CommonUtils.createDirectory(path, BANK_LIMBO_NAME, DIR_BASE);
         counterfeitPath = CommonUtils.createDirectory(path, COUNTERFEIT_DIR_NAME, DIR_BASE);
         importPath = CommonUtils.createDirectory(path, IMPORT_DIR_NAME, DIR_BASE);
@@ -271,33 +276,56 @@ public class DepositFragment extends BaseFragment2 implements View.OnClickListen
             @Override
             public void run() {
                 Log.e("Locker", lockerCode);
+                File file = null;
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                    // For Android 11 and above, use the app-specific storage on the SD card
+                    sdcard = getActivity().getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS);
+                } else {
+                    // For older versions, use the standard SD card location
+                    File[] externalDirs = getActivity().getExternalFilesDirs(null);
+                    if (externalDirs.length > 1 && externalDirs[1] != null) {
+                        sdcard = externalDirs[1];
+                    }
+                }
+
                 try {
                     raidax.importLockerCode(lockerCode);
-                    int k =0 ;
-                    String pathSeparator = System.getProperty("file.separator");
+                    if(RAIDAX.peekCloudCoins.size() == 0) {
+                        getActivity().runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                llProgress.setVisibility(View.GONE);
+                                Toast.makeText(getActivity(), "No Coins found in this locker code.",Toast.LENGTH_SHORT).show();
+                                // Perform UI-related operations here
+                            }
+                        });
+                    } else {
+                        int k =0 ;
 
-                    File newDirectory = new File(Environment.getExternalStorageDirectory().toString(), "CloudCoins");
-                    //if(!newDirectory.exists())
-                        newDirectory.mkdirs();
+                        for(CloudCoin cc: RAIDAX.peekCloudCoins) {
+                            CloudCoinFileWriter.WriteCoinToFile(cc,9,predetectPath);
+                        }
 
-                    String folder = Environment.getExternalStorageDirectory().toString() + pathSeparator + "CloudCoins";
-                    Log.d(RAIDAX.TAG,folder);
-                    for (RaidaResponse response:
-                         RAIDAX.getInstance().raidaResponses) {
-                        String targetFolder = "";
+                        raidax.removeFromLocker();
 
-                        Log.d(RAIDAX.TAG,"Writing Response for Raida-" + k + "-" + response.getResponseHex() );
-                        CloudCoinFileWriter.WriteBytesToFile(response.getResponse(), folder + pathSeparator + "response" + k++ + ".bin"  );
+//                        for (RaidaResponse response:
+//                                RAIDAX.getInstance().raidaResponses) {
+//
+//                            Log.d(RAIDAX.TAG,"Writing Response for Raida-" + k + "-" + response.getResponseHex() );
+//                            CloudCoinFileWriter.WriteBytesToFile(response.getResponse(),  "response" + k++ + ".bin"  );
+//                        }
+
+                        getActivity().runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                llProgress.setVisibility(View.GONE);
+                                Toast.makeText(getActivity(), "Locker Import operation completed", Toast.LENGTH_SHORT).show();
+                                // Perform UI-related operations here
+                            }
+                        });
                     }
 
-                    getActivity().runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            llProgress.setVisibility(View.GONE);
-                            Toast.makeText(getActivity(), "Locker Import operation completed", Toast.LENGTH_SHORT).show();
-                            // Perform UI-related operations here
-                        }
-                    });
+
                 }catch (Exception e) {
                     Log.e("Lokcer", e.getMessage());
                     e.printStackTrace();
