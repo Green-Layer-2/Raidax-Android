@@ -302,9 +302,9 @@ public class DepositFragment extends BaseFragment2 implements View.OnClickListen
                     } else {
                         int k =0 ;
 
-                        for(CloudCoin cc: RAIDAX.peekCloudCoins) {
-                            CloudCoinFileWriter.WriteCoinToFile(cc,9,predetectPath);
-                        }
+//                        for(CloudCoin cc: RAIDAX.peekCloudCoins) {
+//                            CloudCoinFileWriter.WriteCoinToFile(cc,9,predetectPath);
+//                        }
 
                         raidax.removeFromLocker();
 

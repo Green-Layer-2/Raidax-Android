@@ -236,28 +236,97 @@ public class RAIDAX {
     public void removeFromLocker() throws Exception{
         for (int i = 0; i < raidaLists.size(); i++) {
             byte[] request = Protocol.GenerateRequest(i, CommandCodes.RemoveLocker, "", CommandGroups.Locker);
-            udpCalls.add(new UDPCall(request, i, CommandCodes.Peek));
+            udpCalls.add(new UDPCall(request, i, CommandCodes.RemoveLocker));
         }
 
         ExecutorService executorService = Executors.newCachedThreadPool();
         List<Future<RaidaResponse>> futures = new ArrayList<>();
 
         // Assuming you have a list of UDPCall objects called udpCalls
-//        for (UDPCall udpCall : udpCalls) {
-//            Future<RaidaResponse> future = executorService.submit(() -> executeCommand(udpCall));
-//            futures.add(future);
-//        }
+        for (UDPCall udpCall : udpCalls) {
+            Future<RaidaResponse> future = executorService.submit(() -> executeCommand(udpCall));
+            futures.add(future);
+        }
+
+        executorService.shutdown();
+        executorService.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
+
+        ArrayList<RaidaResponse> results = new ArrayList<>();
+        for (Future<RaidaResponse> future : futures) {
+            try {
+                results.add(future.get());
+            } catch (ExecutionException e) {
+                // Handle any exceptions thrown during the execution of the task
+            }
+        }
+        int i =0;
+
+        initiatePeekResultCodes(peekCloudCoins.size(), 'x');
+        i = 0;
+        // Populate Pown results
+        for (RaidaResponse result : results) {
+            String resultCode = Utils.bytesToHex(result.getResponse()).substring(4, 6);
+            if (resultCode.equals("F1")) {
+                fillPeekRow(i, peekCloudCoins.size(), 'p');
+                Log.d(RAIDAX.TAG,"Remove All Passed");
+            } else if (resultCode.equals("25")) {
+                fillPeekRow(i, peekCloudCoins.size(), 'f');
+                Log.d(RAIDAX.TAG,"Remove All failed" + i);
+            } else {
+
+            }
+            i++;
+        }
+
+        // Calculate Pown result
+        i = 0;
+        for (CloudCoin cc:
+                RAIDAX.peekCloudCoins) {
+            StringBuilder sb = new StringBuilder();
+            for (int j = 0; j < RAIDAX.NUM_SERVERS; j++) {
+                sb.append(peekResultCodes[j][i]);
+            }
+            cc.setPownString(sb.toString());
+            i++;
+            Log.d(RAIDAX.TAG, "Pown String for " + i + ":" + sb);
+        }
+
+        for (CloudCoin cc : RAIDAX.peekCloudCoins) {
+            if(cc.getTargetFolder().equals("Bank")) {
+                CloudCoinFileWriter.WriteCoinToFile(cc, 9, DepositFragment.bankDirPath);
+                Log.d(RAIDAX.TAG, "Wrote to " + DepositFragment.bankDirPath);
+            }
+            if(cc.getTargetFolder().equals("Counterfeit")) {
+                CloudCoinFileWriter.WriteCoinToFile(cc, 9, DepositFragment.counterfeitPath);
+                Log.d(RAIDAX.TAG, "Wrote to " + DepositFragment.counterfeitPath);
+            }
+
+        }
+
+        long count = RAIDAX.peekCloudCoins.stream().filter(obj -> obj.getTargetFolder() == "Bank").count();
+        long ccount = RAIDAX.peekCloudCoins.stream().filter(obj -> obj.getTargetFolder() == "Counterfeit").count();
+
+        Log.d(RAIDAX.TAG,"Bank Coins" + count);
+        Log.d(RAIDAX.TAG,"Counterfeits Coins" + ccount);
+
+
+
+        Log.d(RAIDAX.TAG,"Filled up");
+
+//        for (RaidaResponse res:
+//             results) {
+//            String response = Utils.bytesToHex(res.getResponse());
+//            String resultCode = response.substring(4, 6);
+//            if (resultCode.equals("F1")) {
 //
-//        executorService.shutdown();
-//        executorService.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
+//            } else if (resultCode.equals("25")) {
+//                Log.d(RAIDAX.TAG,"All failed");
+//            } else if (resultCode.equals("F2")){
 //
-//        ArrayList<RaidaResponse> results = new ArrayList<>();
-//        for (Future<RaidaResponse> future : futures) {
-//            try {
-//                results.add(future.get());
-//            } catch (ExecutionException e) {
-//                // Handle any exceptions thrown during the execution of the task
+//            } else {
+//
 //            }
+//            Log.d(RAIDAX.TAG, "Remove Response for " + i++ +":" + response);
 //        }
 
     }
@@ -403,7 +472,7 @@ public class RAIDAX {
             peekResult.setData(extractPeekData(result.getResponse()));
             peekResults.add(peekResult);
             for (Coin coin : peekResult.coins) {
-                Log.d("RAIDAX", "DN:" + coin.getDenomination() + ", SN:" + coin.getSN());
+                //Log.d("RAIDAX", "DN:" + coin.getDenomination() + ", SN:" + coin.getSN());
                 if (!pcoins.contains(coin))
                     pcoins.add(coin);
 
@@ -412,8 +481,8 @@ public class RAIDAX {
                 passCount++;
             if (passCount == 25)
                 peekAllPassed = true;
-            Log.d("RAIDAX", Utils.bytesToHex(result.getResponse()));
-            Log.d("RAIDAX", "Code:" + resultCode);
+            //Log.d("RAIDAX", Utils.bytesToHex(result.getResponse()));
+            //Log.d("RAIDAX", "Code:" + resultCode);
             i++;
         }
 
@@ -422,7 +491,7 @@ public class RAIDAX {
             RAIDAX.peekCloudCoins.add(new CloudCoin(pcoin));
         }
 
-        initiatePeekResultCodes(pcoins.size(), 'f');
+        initiatePeekResultCodes(pcoins.size(), 'x');
         i = 0;
         // Populate Pown results
         for (RaidaResponse result : results) {

@@ -170,7 +170,7 @@ public class Protocol {
             body[body.length -2] = 0x3e;
 
             byte[] request = new byte[header.length + body.length];
-            Log.d("RAIDAX-Request", Utils.bytesToHex(body));
+            //Log.d("RAIDAX-Request", Utils.bytesToHex(body));
 
             System.arraycopy(header, 0, request, 0, header.length);
             System.arraycopy(body, 0, request, 32, body.length);
@@ -182,13 +182,12 @@ public class Protocol {
             byte[] challenge = generateChallenge();
             String an = code;
 
-            byte[] md5Bytes = getLockerIDForRAIDA(an+10, raidaID);
+            byte[] md5Bytes = getLockerIDForRAIDA(an+1, raidaID);
 
             byte[] body = new byte[32 + (21* RAIDAX.peekCloudCoins.size()) + 2];
 
             System.arraycopy(challenge, 0, body,0, 16);
             System.arraycopy(md5Bytes, 0, body,16, 16);
-
 
             int i = 0;
             for (CloudCoin cc:
@@ -209,7 +208,7 @@ public class Protocol {
             byte[] header = generateXHeader(raidaID, commandCode, body.length, commandGroup);
 
             byte[] request = new byte[header.length + body.length];
-            Log.d(RAIDAX.TAG,"Remove for " + an + ":"+ Utils.bytesToHex(body));
+            //Log.d(RAIDAX.TAG,"Remove for " + an + ":"+ Utils.bytesToHex(body));
 
             System.arraycopy(header, 0, request, 0, header.length);
             System.arraycopy(body, 0, request, 32, body.length);

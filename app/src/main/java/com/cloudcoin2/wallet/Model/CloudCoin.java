@@ -26,12 +26,27 @@ public class CloudCoin {
     private int failCount = 0;
     private int noResponseCount = 25;
     private String pownString;
-
+    private  int countOccurrences(String str, char c) {
+        int count = 0;
+        for (int i = 0; i < str.length(); i++) {
+            if (str.charAt(i) == c) {
+                count++;
+            }
+        }
+        return count;
+    }
     public void setPownString(String pownString) {
         this.pownString= pownString;
+        int passCount = countOccurrences(pownString,'p');
+        int failCount = countOccurrences(pownString,'f');
+
         if(pownString.equals("ppppppppppppppppppppppppp")) {
             targetFolder = "Bank";
         } else if (pownString.equals("fffffffffffffffffffffffff")) {
+            targetFolder = "Counterfeit";
+        } else if (passCount > 13) {
+            targetFolder = "Bank";
+        } else {
             targetFolder = "Counterfeit";
         }
 
