@@ -309,25 +309,8 @@ public class RAIDAX {
         Log.d(RAIDAX.TAG,"Bank Coins" + count);
         Log.d(RAIDAX.TAG,"Counterfeits Coins" + ccount);
 
-
-
-        Log.d(RAIDAX.TAG,"Filled up");
-
-//        for (RaidaResponse res:
-//             results) {
-//            String response = Utils.bytesToHex(res.getResponse());
-//            String resultCode = response.substring(4, 6);
-//            if (resultCode.equals("F1")) {
-//
-//            } else if (resultCode.equals("25")) {
-//                Log.d(RAIDAX.TAG,"All failed");
-//            } else if (resultCode.equals("F2")){
-//
-//            } else {
-//
-//            }
-//            Log.d(RAIDAX.TAG, "Remove Response for " + i++ +":" + response);
-//        }
+        udpCalls.clear();
+        connectionPool.releaseAllConnections();
 
     }
 
