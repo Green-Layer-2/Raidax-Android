@@ -60,7 +60,7 @@ public class RAIDAX {
     private final Object lock = new Object();
     private boolean isExecuting = false;
     private ArrayList<PeekResult> peekResults = new ArrayList<>();
-    public static ArrayList<Denominations> denominations = new ArrayList<>();
+
     public static ArrayList<CloudCoin> peekCloudCoins = new ArrayList<>();
     public char[][] peekResultCodes = new char[RAIDAX.NUM_SERVERS][];
     public static boolean peekAllPassed = false;
@@ -109,23 +109,23 @@ public class RAIDAX {
     private static RAIDAX raida;
 
     public void RAIDAX() {
-        RAIDAX.denominations.clear();
-        RAIDAX.denominations.add(new Denominations(-8, .00000001));
-        RAIDAX.denominations.add(new Denominations(-7, .0000001));
-        RAIDAX.denominations.add(new Denominations(-6, .000001));
-        RAIDAX.denominations.add(new Denominations(-5, .00001));
-        RAIDAX.denominations.add(new Denominations(-4, .0001));
-        RAIDAX.denominations.add(new Denominations(-3, .001));
-        RAIDAX.denominations.add(new Denominations(-2, .01));
-        RAIDAX.denominations.add(new Denominations(-1, .1));
-        RAIDAX.denominations.add(new Denominations(0, 1));
-        RAIDAX.denominations.add(new Denominations(1, 10));
-        RAIDAX.denominations.add(new Denominations(2, 100));
-        RAIDAX.denominations.add(new Denominations(3, 1000));
-        RAIDAX.denominations.add(new Denominations(4, 10000));
-        RAIDAX.denominations.add(new Denominations(5, 100000));
-        RAIDAX.denominations.add(new Denominations(6, 1000000));
-        RAIDAX.denominations.add(new Denominations(7, 10000000));
+//        RAIDAX.denominations.clear();
+//        RAIDAX.denominations.add(new Denominations(-8, .00000001));
+//        RAIDAX.denominations.add(new Denominations(-7, .0000001));
+//        RAIDAX.denominations.add(new Denominations(-6, .000001));
+//        RAIDAX.denominations.add(new Denominations(-5, .00001));
+//        RAIDAX.denominations.add(new Denominations(-4, .0001));
+//        RAIDAX.denominations.add(new Denominations(-3, .001));
+//        RAIDAX.denominations.add(new Denominations(-2, .01));
+//        RAIDAX.denominations.add(new Denominations(-1, .1));
+//        RAIDAX.denominations.add(new Denominations(0, 1));
+//        RAIDAX.denominations.add(new Denominations(1, 10));
+//        RAIDAX.denominations.add(new Denominations(2, 100));
+//        RAIDAX.denominations.add(new Denominations(3, 1000));
+//        RAIDAX.denominations.add(new Denominations(4, 10000));
+//        RAIDAX.denominations.add(new Denominations(5, 100000));
+//        RAIDAX.denominations.add(new Denominations(6, 1000000));
+//        RAIDAX.denominations.add(new Denominations(7, 10000000));
     }
 
     public static RAIDAX getInstance() {
@@ -435,7 +435,8 @@ public class RAIDAX {
 
     public static byte[] extractPeekData(byte[] input) {
         if (input.length < 34) {
-            throw new IllegalArgumentException("Input array must be at least 34 bytes long.");
+            return new byte[0];
+            //throw new IllegalArgumentException("Input array must be at least 34 bytes long.");
         }
         byte[] output = Arrays.copyOfRange(input, 32, input.length - 2);
         return output;
@@ -453,6 +454,7 @@ public class RAIDAX {
             String resultCode = Utils.bytesToHex(result.getResponse()).substring(4, 6);
             PeekResult peekResult = new PeekResult();
             peekResult.setData(extractPeekData(result.getResponse()));
+            if(peekResult.getData().length == 0) Log.d(RAIDAX.TAG,"Got empty peek response for " + i);
             peekResults.add(peekResult);
             for (Coin coin : peekResult.coins) {
                 //Log.d("RAIDAX", "DN:" + coin.getDenomination() + ", SN:" + coin.getSN());
@@ -464,7 +466,7 @@ public class RAIDAX {
                 passCount++;
             if (passCount == 25)
                 peekAllPassed = true;
-            //Log.d("RAIDAX", Utils.bytesToHex(result.getResponse()));
+            Log.d(RAIDAX.TAG,"Peek Response: " + Utils.bytesToHex(result.getResponse()));
             //Log.d("RAIDAX", "Code:" + resultCode);
             i++;
         }

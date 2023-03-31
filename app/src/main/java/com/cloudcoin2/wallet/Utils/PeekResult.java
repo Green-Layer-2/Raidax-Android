@@ -7,6 +7,8 @@ public class PeekResult {
     public byte[] data;
     public ArrayList<Coin> coins;
 
+    public byte[] getData() { return  data;}
+
     public void setData(byte[] data) {
         if (data.length % 5 != 0) {
             throw new IllegalArgumentException("Data array must be a multiple of 5 bytes long.");

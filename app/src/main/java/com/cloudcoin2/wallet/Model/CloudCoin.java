@@ -2,8 +2,12 @@ package com.cloudcoin2.wallet.Model;
 
 import static com.cloudcoin2.wallet.Utils.RAIDA.bytesToHex;
 
+import android.util.Log;
+
 import com.cloudcoin2.wallet.Utils.Coin;
+import com.cloudcoin2.wallet.Utils.Denominations;
 import com.cloudcoin2.wallet.Utils.RAIDAX;
+import com.cloudcoin2.wallet.Utils.Utils;
 
 import java.nio.ByteBuffer;
 import java.security.SecureRandom;
@@ -120,6 +124,7 @@ public class CloudCoin {
         for (int i = 0; i < RAIDAX.NUM_SERVERS; i++) {
             ans[i] = generateRandomAN(16);
             pans[i] = ans[i];
+            //Log.d(RAIDAX.TAG,"Generated AN:" + Utils.bytesToHex(ans[i]));
         }
 
     }
@@ -194,6 +199,7 @@ public class CloudCoin {
     public byte getDenomination() { return this.denomination;}
 
     public void setDenomination(byte denomination) {
+
         this.denomination = denomination;
     }
 
@@ -260,8 +266,9 @@ public class CloudCoin {
 
         String denominationWhole = String.valueOf(btc);
         String satoshiesFraction = String.format("%09d", sat);
+        satoshiesFraction = Denominations.getDenomination(denomination);
 
-        String fileName = denominationWhole + " BTC " + satoshiesFraction + " SAT." + pownString + "." + serialNumber + "." + extension;
+        String fileName = denominationWhole + ".BTC." + satoshiesFraction + ".SAT." + pownString + "." + serialNumber + "." + extension;
         return fileName;
     }
     public boolean  isFracked()
