@@ -306,7 +306,7 @@ public class DepositFragment extends BaseFragment2 implements View.OnClickListen
 //                            CloudCoinFileWriter.WriteCoinToFile(cc,9,predetectPath);
 //                        }
 
-                        raidax.removeFromLocker();
+                        raidax.removeFromLocker(lockerCode);
 
 //                        for (RaidaResponse response:
 //                                RAIDAX.getInstance().raidaResponses) {

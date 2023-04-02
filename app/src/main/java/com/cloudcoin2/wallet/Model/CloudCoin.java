@@ -265,8 +265,7 @@ public class CloudCoin {
         int sat = (int) (Math.pow(2, denomination) * 1000);
 
         String denominationWhole = String.valueOf(btc);
-        String satoshiesFraction = String.format("%09d", sat);
-        satoshiesFraction = Denominations.getDenomination(denomination);
+        String satoshiesFraction = Denominations.getDenomination(denomination);
 
         String fileName = denominationWhole + ".BTC." + satoshiesFraction + ".SAT." + pownString + "." + serialNumber + "." + extension;
         return fileName;

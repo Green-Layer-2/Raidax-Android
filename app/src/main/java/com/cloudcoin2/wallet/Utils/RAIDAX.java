@@ -233,9 +233,10 @@ public class RAIDAX {
 
     }
 
-    public void removeFromLocker() throws Exception{
+    public void removeFromLocker(String code) throws Exception{
         for (int i = 0; i < raidaLists.size(); i++) {
-            byte[] request = Protocol.GenerateRequest(i, CommandCodes.RemoveLocker, "", CommandGroups.Locker);
+            byte[] request = Protocol.GenerateRequest(i, CommandCodes.RemoveLocker, code, CommandGroups.Locker);
+            Log.d(RAIDAX.TAG, "Remove Request for RAIDA " + i + ": " + Utils.bytesToHex(request));
             udpCalls.add(new UDPCall(request, i, CommandCodes.RemoveLocker));
         }
 
@@ -266,10 +267,11 @@ public class RAIDAX {
         // Populate Pown results
         for (RaidaResponse result : results) {
             String resultCode = Utils.bytesToHex(result.getResponse()).substring(4, 6);
+            Log.d(RAIDAX.TAG, "Response for Remove from RAIDA " + i + ": " + Utils.bytesToHex(result.getResponse()));
             if (resultCode.equals("F1")) {
                 fillPeekRow(i, peekCloudCoins.size(), 'p');
                 Log.d(RAIDAX.TAG,"Remove All Passed");
-            } else if (resultCode.equals("25")) {
+            } else if (resultCode.equals("F2")) {
                 fillPeekRow(i, peekCloudCoins.size(), 'f');
                 Log.d(RAIDAX.TAG,"Remove All failed" + i);
             } else {

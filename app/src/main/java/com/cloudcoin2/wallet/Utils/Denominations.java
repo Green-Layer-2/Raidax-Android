@@ -52,9 +52,5 @@ public class Denominations {
         this.fraction = fraction;
         this.stringRepresentation = stringRepresentation;
     }
-//    Denominations(int decimal, double fraction) {
-//        this.decimal = decimal;
-//        this.fraction = fraction;
-//    }
 
 }

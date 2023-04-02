@@ -10,18 +10,62 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
+import java.util.Arrays;
+import java.util.Random;
+import java.util.zip.CRC32;
+
 import org.apache.commons.codec.binary.Hex;
 
 public class Protocol {
 
+    public static byte[] generateStaticChallenge() {
+        byte[] staticChallenge = new byte[16];
+        Arrays.fill(staticChallenge, (byte) 0xAA);
+        return  staticChallenge;
+    }
+
+    public static byte[] generateNewChallenge() {
+        byte[] challenge = new byte[12];
+        //new Random().nextBytes(challenge);
+        Arrays.fill(challenge, (byte) 0xAA);
+
+        byte[] crc32Bytes = ByteBuffer.allocate(4).putInt(getCRC32(challenge)).array();
+
+        byte[] challengeWithCrc32 = new byte[16];
+        System.arraycopy(challenge, 0, challengeWithCrc32, 0, 12);
+        System.arraycopy(crc32Bytes, 0, challengeWithCrc32, 12, 4);
+
+        return challengeWithCrc32;
+    }
+
+    private static int getCRC32(byte[] data) {
+        CRC32 crc32 = new CRC32();
+        crc32.update(data);
+        return (int) crc32.getValue();
+    }
     public static byte[] generateChallenge() {
         byte[] challenge = generateRandom(12);
         byte[] checksumTotal = Utils.generateCRC32(challenge);
         byte[] checksum = new byte[4];
         System.arraycopy(checksumTotal, checksumTotal.length - 4, checksum, 0, 4);
-        byte[] mData = new byte[challenge.length + checksum.length + 2];
+        byte[] mData = new byte[challenge.length + checksum.length +2];
         mData[mData.length - 2] = 0x3e;
         mData[mData.length - 1] = 0x3e;
+        ByteBuffer buff = ByteBuffer.wrap(mData);
+        buff.put(challenge);
+        buff.put(checksum);
+        byte[] challengeData = buff.array();
+        return challengeData;
+    }
+
+    public static byte[] generateCommandChallenge() {
+        byte[] challenge = generateRandom(12);
+        byte[] checksumTotal = Utils.generateCRC32(challenge);
+        byte[] checksum = new byte[4];
+        System.arraycopy(checksumTotal, checksumTotal.length - 4, checksum, 0, 4);
+        byte[] mData = new byte[challenge.length + checksum.length ];
+        //mData[mData.length - 2] = 0x3e;
+        //mData[mData.length - 1] = 0x3e;
         ByteBuffer buff = ByteBuffer.wrap(mData);
         buff.put(challenge);
         buff.put(checksum);
@@ -181,8 +225,8 @@ public class Protocol {
         if(commandCode == CommandCodes.RemoveLocker) {
             byte[] challenge = generateChallenge();
             String an = code;
-
-            byte[] md5Bytes = getLockerIDForRAIDA(an+1, raidaID);
+            String ch = Utils.bytesToHex(challenge);
+            byte[] md5Bytes = getLockerIDForRAIDA(an, raidaID);
 
             byte[] body = new byte[32 + (21* RAIDAX.peekCloudCoins.size()) + 2];
 
@@ -200,9 +244,12 @@ public class Protocol {
                 coinbytes[4] = cc.getSerial()[3];
 
                 System.arraycopy(cc.getPans()[raidaID], 0, coinbytes,5, 16);
-                System.arraycopy(coinbytes, 0, body,5 + (21*i), 16);
+                System.arraycopy(coinbytes, 0, body,32 + (21*i), 16);
                 i++;
             }
+            System.arraycopy(challenge, 0, body,0, 16);
+            System.arraycopy(md5Bytes, 0, body,16, 16);
+
             body[body.length -1] = 0x3e;
             body[body.length -2] = 0x3e;
             byte[] header = generateXHeader(raidaID, commandCode, body.length, commandGroup);
