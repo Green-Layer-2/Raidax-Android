@@ -1,6 +1,5 @@
 package com.cloudcoin2.wallet.withdraw;
 
-
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
@@ -145,7 +144,6 @@ public class WithdrawFragment extends BaseFragment2 implements View.OnClickListe
             mAdapter.addData(new EchoStatus(0, "Test"));
         }
         rvIndicator.setAdapter(mAdapter);
-
     }
 
     @Override
@@ -169,20 +167,13 @@ public class WithdrawFragment extends BaseFragment2 implements View.OnClickListe
         frackedDirPath = CommonUtils.createDirectory(path, FRACKED_DIR_NAME, DIR_BASE);
         trashPath = CommonUtils.createDirectory(path, TRASH_DIR_NAME, DIR_BASE);
         exportPath = CommonUtils.createDirectory(path, EXPORT_DIR_NAME, DIR_BASE);
-
     }
 
     private void calculateCoins() {
-//        lCoinCount = DatabaseClient.getInstance(getActivity()).getAppDatabase()
-//                .coinDao()//.getAll();
-//                .getAllBank("Bank", "Fracked");
-//
-//        totalPrice.setText(String.valueOf(lCoinCount.size()));
         int bankCoins = CommonUtils.countFiles(CommonUtils.getFolderPath(getActivity(),"Bank"),".bin");
         int frackedCoins = CommonUtils.countFiles(CommonUtils.getFolderPath(getActivity(),"Fracked"),".bin");
         totalCoins = bankCoins + frackedCoins;
         totalPrice.setText(String.valueOf(bankCoins + frackedCoins));
-
     }
 
     private void setdata(int itemWidth) {
@@ -424,9 +415,7 @@ public class WithdrawFragment extends BaseFragment2 implements View.OnClickListe
                     } else {
                         showMessage("Server Error Please try again");
                     }
-
                 }
-
                 showMessage(amount + "  Coins exported to Exported Folder");
             } else {
                 showMessage("count not available");
@@ -438,8 +427,6 @@ public class WithdrawFragment extends BaseFragment2 implements View.OnClickListe
         updateView();
 
         openShareDialog(exportedPath);
-       // openFile(exportPath);
-
     }
 
     private void openFile(String exportPath) {

@@ -7,16 +7,46 @@ import com.cloudcoin2.wallet.Model.CloudCoin;
 import com.cloudcoin2.wallet.deposit.DepositFragment;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class CloudCoinFileWriter {
 
-    public static boolean WriteBytesToFile(byte[] data, String path) {
+    public static byte[] readBytesFromFile(String filePath) throws IOException {
+        File file = new File(filePath);
+        long fileSize = file.length();
+        byte[] buffer = new byte[(int) fileSize];
+        try (FileInputStream fis = new FileInputStream(file)) {
+            fis.read(buffer);
+        }
+        return buffer;
+    }
+    public static List<CloudCoin> loadCoinsFromFolder(String folderPath) {
+        File folder = new File(folderPath);
+        File[] files = folder.listFiles((dir, name) -> name.endsWith(".bin"));
+
+        List<CloudCoin> coins = new ArrayList<>();
+        for (File file : files) {
+            try (FileInputStream inputStream = new FileInputStream(file)) {
+                byte[] data = readBytesFromFile(file.getAbsolutePath());
+                coins.add(new CloudCoin(data));
+                            } catch (IOException e) {
+                // Handle IO Exception
+            }
+        }
+        return coins;
+    }
+
+
+
+public static boolean WriteBytesToFile(byte[] data, String path) {
         File file = null;
         if (DepositFragment.sdcard != null) {
             file = new File(DepositFragment.sdcard, path);

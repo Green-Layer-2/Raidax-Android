@@ -33,16 +33,19 @@ import com.cloudcoin2.wallet.Model.DetectionCoinsModel;
 import com.cloudcoin2.wallet.Model.EchoStatus;
 import com.cloudcoin2.wallet.Model.RaidaItems;
 import com.cloudcoin2.wallet.R;
+import com.cloudcoin2.wallet.Utils.CloudCoinFileWriter;
 import com.cloudcoin2.wallet.Utils.CommandCodes;
 import com.cloudcoin2.wallet.Utils.CommonUtils;
 import com.cloudcoin2.wallet.Utils.Constants;
 import com.cloudcoin2.wallet.Utils.CouldcoinApplication;
+import com.cloudcoin2.wallet.Utils.Denominations;
 import com.cloudcoin2.wallet.Utils.EchoResult;
 import com.cloudcoin2.wallet.Utils.KotlinUtils;
 import com.cloudcoin2.wallet.Utils.PermissionUtils;
 import com.cloudcoin2.wallet.Utils.RAIDA;
 import com.cloudcoin2.wallet.Utils.RAIDAX;
 import com.cloudcoin2.wallet.Utils.UDPCallBackInterface;
+import com.cloudcoin2.wallet.Utils.Utils;
 import com.cloudcoin2.wallet.base.BaseFragment2;
 import com.cloudcoin2.wallet.Utils.ScreeUtils;
 import com.cloudcoin2.wallet.db.DatabaseClient;
@@ -64,6 +67,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.text.DecimalFormat;
 
 /**
  * Created by Arka Chakraborty on 15/02/22
@@ -309,10 +313,41 @@ public class HomeFragment extends BaseFragment2 implements UDPCallBackInterface 
             getActivity().runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
+                    byte value = -5; // Your byte value
+                    String bits = "";
+                    // Print bits in the byte
+                    for (int i = 7; i >= 0; i--) {
+                        int bit = (value >> i) & 1;
+                        bits += bit;
+                        System.out.print(bit);
+                    }
+                    Log.d(RAIDAX.TAG, "Bits:" + bits + ". Hex: " + Integer.toHexString(value));
+
+                    System.out.println();
                     try {
+                        List<CloudCoin> ccs =  CloudCoinFileWriter.loadCoinsFromFolder(bankDirPath);
+                        List<CloudCoin> ccsf =  CloudCoinFileWriter.loadCoinsFromFolder(frackedDirPath);
+
+                        Log.d(RAIDAX.TAG, "Coins Loaded:" + ccs.size());
+                        int i =0;
+                        double total = 0;
+                        for (CloudCoin cc:
+                             ccs) {
+                            total += Denominations.getFraction(cc.getDenomination());
+                            //Log.d(RAIDAX.TAG, "Coin  " + i++ + " : " + cc.getDenomination() + ". Serial :" + cc.getSerialAsInt() + ", Fraction: "+ total);
+                        }
+                        for (CloudCoin cc:
+                                ccsf) {
+                            total += Denominations.getFraction(cc.getDenomination());
+                            //Log.d(RAIDAX.TAG, "Coin  " + i++ + " : " + cc.getDenomination() + ". Serial :" + cc.getSerialAsInt() + ", Fraction: "+ total);
+                        }
+
+                        DecimalFormat decimalFormat = new DecimalFormat("0.#####");
+                        String stringValue = decimalFormat.format(total);
+                        Log.d(RAIDAX.TAG,"Total: "+ stringValue);
                         int bankCoins = CommonUtils.countFiles(CommonUtils.getFolderPath(getActivity(),"Bank"),".bin");
                         int frackedCoins = CommonUtils.countFiles(CommonUtils.getFolderPath(getActivity(),"Fracked"),".bin");
-                        tvTotalAmount.setText(String.valueOf(bankCoins + frackedCoins));
+                        tvTotalAmount.setText(stringValue);
                     }
                     catch (Exception e) {
                         Log.e("Error", e.getMessage());

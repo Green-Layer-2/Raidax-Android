@@ -16,6 +16,14 @@ public class Coin {
                 ((data[4] & 0xFF) << 0);
     }
 
+    public Coin() {
+
+    }
+
+    public Coin(byte[] data) {
+        setData(data);
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (this == obj) {

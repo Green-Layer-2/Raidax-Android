@@ -12,6 +12,7 @@ import com.cloudcoin2.wallet.Utils.Utils;
 import java.nio.ByteBuffer;
 import java.security.SecureRandom;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class CloudCoin {
@@ -113,7 +114,37 @@ public class CloudCoin {
 
     }
 
+    public CloudCoin(byte[] data) {
+        // Skip first 32 bytes (header)
+        int offset = 34;
 
+        // Read denomination byte
+        this.denomination = data[offset];
+        offset++;
+
+        // Read serial number as 4 bytes
+        this.serial = new byte[4];
+        System.arraycopy(data, offset, this.serial, 0, 4);
+        offset += 4;
+
+        // Read ANs as 25 blocks of 16 bytes each
+        this.ans = new byte[25][16];
+        for (int i = 0; i < 25; i++) {
+            System.arraycopy(data, offset, this.ans[i], 0, 16);
+            offset += 16;
+        }
+
+        // Initialize other fields to their default values
+        this.pans = new byte[25][16];
+        this.pownStatus = new byte[25];
+        Arrays.fill(this.pownStatus, (byte) -1);
+        this.pownResponse = new byte[12];
+        this.passCount = 0;
+        this.failCount = 0;
+        this.noResponseCount = 25;
+        this.pownString = "";
+        this.targetFolder = "";
+    }
     public CloudCoin(Coin coin) {
         this.denomination = (byte) coin.getDenomination();
         this.serial = intToByteArray(coin.getSN());
@@ -341,7 +372,6 @@ public class CloudCoin {
             }
             return true;
         }
-
         return false;
     }
 
@@ -352,6 +382,5 @@ public class CloudCoin {
     public int getCoinType() {
         return coinType;
     }
-
 
 }

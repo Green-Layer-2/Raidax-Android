@@ -235,7 +235,7 @@ public class RAIDAX {
 
     public void removeFromLocker(String code) throws Exception{
         for (int i = 0; i < raidaLists.size(); i++) {
-            byte[] request = Protocol.GenerateRequest(i, CommandCodes.RemoveLocker, code, CommandGroups.Locker);
+            byte[] request = Protocol.GenerateRequest(i, CommandCodes.RemoveLocker,  code, CommandGroups.Locker);
             Log.d(RAIDAX.TAG, "Remove Request for RAIDA " + i + ": " + Utils.bytesToHex(request));
             udpCalls.add(new UDPCall(request, i, CommandCodes.RemoveLocker));
         }
@@ -390,7 +390,7 @@ public class RAIDAX {
 
         for (int i = 0; i < raidaLists.size(); i++) {
             byte[] request = Protocol.GenerateRequest(i, CommandCodes.Echo, "", CommandGroups.Status);
-            Log.d("RAIDAX", Utils.bytesToHex(request));
+            //Log.d("RAIDAX", Utils.bytesToHex(request));
             udpCalls.add(new UDPCall(request, i, CommandCodes.Echo));
         }
 

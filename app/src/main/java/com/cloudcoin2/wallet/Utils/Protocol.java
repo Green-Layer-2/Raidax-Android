@@ -17,32 +17,6 @@ import java.util.zip.CRC32;
 import org.apache.commons.codec.binary.Hex;
 
 public class Protocol {
-
-    public static byte[] generateStaticChallenge() {
-        byte[] staticChallenge = new byte[16];
-        Arrays.fill(staticChallenge, (byte) 0xAA);
-        return  staticChallenge;
-    }
-
-    public static byte[] generateNewChallenge() {
-        byte[] challenge = new byte[12];
-        //new Random().nextBytes(challenge);
-        Arrays.fill(challenge, (byte) 0xAA);
-
-        byte[] crc32Bytes = ByteBuffer.allocate(4).putInt(getCRC32(challenge)).array();
-
-        byte[] challengeWithCrc32 = new byte[16];
-        System.arraycopy(challenge, 0, challengeWithCrc32, 0, 12);
-        System.arraycopy(crc32Bytes, 0, challengeWithCrc32, 12, 4);
-
-        return challengeWithCrc32;
-    }
-
-    private static int getCRC32(byte[] data) {
-        CRC32 crc32 = new CRC32();
-        crc32.update(data);
-        return (int) crc32.getValue();
-    }
     public static byte[] generateChallenge() {
         byte[] challenge = generateRandom(12);
         byte[] checksumTotal = Utils.generateCRC32(challenge);
@@ -58,20 +32,6 @@ public class Protocol {
         return challengeData;
     }
 
-    public static byte[] generateCommandChallenge() {
-        byte[] challenge = generateRandom(12);
-        byte[] checksumTotal = Utils.generateCRC32(challenge);
-        byte[] checksum = new byte[4];
-        System.arraycopy(checksumTotal, checksumTotal.length - 4, checksum, 0, 4);
-        byte[] mData = new byte[challenge.length + checksum.length ];
-        //mData[mData.length - 2] = 0x3e;
-        //mData[mData.length - 1] = 0x3e;
-        ByteBuffer buff = ByteBuffer.wrap(mData);
-        buff.put(challenge);
-        buff.put(checksum);
-        byte[] challengeData = buff.array();
-        return challengeData;
-    }
 
     public static byte[] generateRandom(int length) {
         return generateRandom(length, null, false);
@@ -117,27 +77,6 @@ public class Protocol {
             return null;
         }
     }
-    public byte[][] getLockerIDsFromTransmitCodeq(String code)  {
-        byte[][] ans = new byte[24][];
-        String[] parts = code.split("-");
-        if (parts.length < 2) {
-            return  null;
-        }
-
-        for (int i = 0; i < 24; i++) {
-            String obj = i + parts[0] + "-" + parts[1];
-            byte[] md5 = Utils.generateMD5Hash(code);
-
-            ans[i] = decodeMD5(md5).getBytes();
-
-            ans[i][12] = (byte) 0xff;
-            ans[i][13] = (byte) 0xff;
-            ans[i][14] = (byte) 0xff;
-            ans[i][15] = (byte) 0xff;
-        }
-
-        return ans;
-    }
 
     public static byte[] getLockerIDForRAIDA(String code, int raidaID) {
         String obj = raidaID + code;
@@ -148,42 +87,6 @@ public class Protocol {
         md5[15] = (byte)0xff;
 
         return md5;
-    }
-
-    public static byte[][] getLockerIDsFromTransmitCode(String code)  {
-        byte[][] ans = new byte[25][];
-        String[] parts = code.split("-");
-        if (parts.length < 2) {
-            return  null;
-        }
-        for (int i = 0; i < 24; i++) {
-            String obj = i + parts[0] + "-" + parts[1];
-            byte[] md5 = Utils.generateMD5Hash(obj);
-            //ans[i] = Hex.decodeHex(Hex.encodeHexString(md5).toCharArray());
-            ans[i]= md5;
-            ans[i][12] = (byte) 0xff;
-            ans[i][13] = (byte) 0xff;
-            ans[i][14] = (byte) 0xff;
-            ans[i][15] = (byte) 0xff;
-        }
-        return ans;
-    }
-
-    private byte[] getMD5(byte[] input) throws NoSuchAlgorithmException {
-        MessageDigest messageDigest = MessageDigest.getInstance("MD5");
-        messageDigest.update(input);
-        return messageDigest.digest();
-    }
-
-    public static byte[] decodeHexString(String hexString) {
-        try {
-            // Convert the hexadecimal string to a byte array
-            byte[] byteArray = Hex.decodeHex(hexString);
-            // Return the resulting byte array
-            return byteArray;
-        } catch (Exception e) {
-            throw new RuntimeException("Error decoding hexadecimal string", e);
-        }
     }
 
     public static byte[] GenerateRequest(int raidaID, int commandCode, String code, int commandGroup ) {
@@ -383,18 +286,5 @@ public class Protocol {
 
         return udpHeader;
     }
-
-    public static byte[] generateHeader(int raidaID, int type) {
-        return generateHeader(raidaID, type, 1, (byte) 0, false, null, null);
-    }
-
-    public static byte[] generateHeader(int raidaID, int type, int udpnum) {
-        return generateHeader(raidaID, type, udpnum, (byte) 0, false, null, null);
-    }
-
-    public static byte[] generateHeader(int raidaID, int type, int udpnum, byte udpChecksum) {
-        return generateHeader(raidaID, type, udpnum, udpChecksum, false, null, null);
-    }
-
 
 }

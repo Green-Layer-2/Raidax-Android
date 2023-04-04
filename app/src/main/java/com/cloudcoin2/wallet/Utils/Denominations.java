@@ -17,6 +17,8 @@ public class Denominations {
         return stringRepresentation;
     }
 
+    public double getFraction() { return  fraction;}
+
     public static String getDenomination(int exponent) {
         List<Denominations> denominations = Denominations.getDenominationsList();
         for (Denominations d : denominations) {
@@ -25,6 +27,16 @@ public class Denominations {
             }
         }
         return null; // or throw an exception, if appropriate
+    }
+
+    public static double getFraction(int exponent) {
+        List<Denominations> denominations = Denominations.getDenominationsList();
+        for (Denominations d : denominations) {
+            if (d.decimal == exponent) {
+                return d.getFraction();
+            }
+        }
+        return 0; // or throw an exception, if appropriate
     }
 
     public static List<Denominations> getDenominationsList() {

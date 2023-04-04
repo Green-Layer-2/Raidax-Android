@@ -7,6 +7,7 @@ import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.database.Cursor;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -40,6 +41,7 @@ import com.cloudcoin2.wallet.Utils.CommandCodes;
 import com.cloudcoin2.wallet.Utils.CommonUtils;
 import com.cloudcoin2.wallet.Utils.Constants;
 import com.cloudcoin2.wallet.Utils.CouldcoinApplication;
+import com.cloudcoin2.wallet.Utils.DatabaseHelper;
 import com.cloudcoin2.wallet.Utils.EchoResult;
 import com.cloudcoin2.wallet.Utils.KotlinUtils;
 import com.cloudcoin2.wallet.Utils.RAIDA;
@@ -68,8 +70,10 @@ import java.nio.ByteBuffer;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
@@ -137,6 +141,8 @@ public class DepositFragment extends BaseFragment2 implements View.OnClickListen
     public static String bankDirPath, limboDirPath, counterfeitPath, importPath, frackedDirPath, trashPath, predetectPath;
     final static int REQUEST_CODE_IMPORT_DIR = 1;
 
+    private DatabaseHelper databaseHelper ;
+
     @Override
     protected int defineLayoutResource() {
         return R.layout.fragment_deposit;
@@ -151,7 +157,7 @@ public class DepositFragment extends BaseFragment2 implements View.OnClickListen
         tvDeposit.setOnClickListener(this);
         tvCancel = view.findViewById(R.id.fragment_deposit_tvCancel);
         tvCancel.setOnClickListener(this);
-
+        databaseHelper = new DatabaseHelper(getActivity());
         llProgress = view.findViewById(R.id.fragment_deposit_llProgress);
         llProgress.setVisibility(View.GONE);
         ivBack = view.findViewById(R.id.fragment_deposit_ivBack);
@@ -159,6 +165,30 @@ public class DepositFragment extends BaseFragment2 implements View.OnClickListen
         int size = ScreeUtils.INSTANCE.getScreenWidth(getBaseActivity()) -
                 getResources().getDimensionPixelSize(R.dimen._220sdp);
         int itemWidth = (size / 25);
+
+        Cursor cursor = databaseHelper.getStatements(); // Assuming you have a method called getStatements() that returns a Cursor
+
+        if (cursor != null && cursor.moveToFirst()) {
+            do {
+                // Retrieve the values from the Cursor
+                String description = cursor.getString(0);
+                long timestamp = cursor.getLong(1);
+
+                // Perform any required operation on the retrieved values
+                // For example, you can print the values
+                Date date = new Date(timestamp);
+
+                // Create a SimpleDateFormat object with the desired date format
+                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
+
+                // Convert the Date object to a formatted date string
+                String dateString = simpleDateFormat.format(date);
+                Log.d(RAIDAX.TAG, "Description: " + description + ", Timestamp: " + dateString);
+            } while (cursor.moveToNext());
+
+            // Close the Cursor after use
+            cursor.close();
+        }
 
         mAdapter = new IndicatorAdapter(getBaseActivity(), itemWidth);
         // rvIndicator.setLayoutManager(new LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false));
@@ -294,6 +324,9 @@ public class DepositFragment extends BaseFragment2 implements View.OnClickListen
                         getActivity().runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
+                                String description = "Attempted Locker code import.No Coins found in locker code " + lockerCode;
+                                long timestamp = System.currentTimeMillis();
+                                databaseHelper.insertStatement(description,timestamp);
                                 llProgress.setVisibility(View.GONE);
                                 Toast.makeText(getActivity(), "No Coins found in this locker code.",Toast.LENGTH_SHORT).show();
                                 // Perform UI-related operations here
