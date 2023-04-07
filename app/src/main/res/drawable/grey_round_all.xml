@@ -4,5 +4,4 @@
 
     <solid android:color="@color/colorCardText"/>
 
-    <corners android:radius="@dimen/_15sdp"/>
 </shape>

@@ -3,8 +3,7 @@
     android:id="@+id/item_indicator_llItem"
     android:layout_width="match_parent"
     android:layout_height="@dimen/_20sdp"
-    android:layout_marginHorizontal="3dp"
-    android:background="@drawable/grey_round_all"
+    android:layout_marginHorizontal="0dp"
     android:orientation="vertical">
 
 </LinearLayout>

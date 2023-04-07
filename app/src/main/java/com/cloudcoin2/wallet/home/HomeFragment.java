@@ -17,6 +17,8 @@ import android.os.StrictMode;
 import android.os.storage.StorageManager;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -97,7 +99,9 @@ public class HomeFragment extends BaseFragment2 implements UDPCallBackInterface 
     boolean isStartupTaskCompleted = false;
     Handler mhandler;
     List<Settings> settingsList;
-    private View batteryProgressFill;
+//    private View batteryProgressFill;
+//    private View batteryProgressEmpty;
+//
     private TextView tvTotalAmount, tvVersion;
     private LinearLayout llDeposit, llWithdraw;
     private List<SavedCoin> mCoinCount = new ArrayList<>();
@@ -118,10 +122,10 @@ public class HomeFragment extends BaseFragment2 implements UDPCallBackInterface 
     private int echoCount = 0, echoPassCount = 0;
     private int mResponseCount = 0;
 
-    private int echoWeight = 0;
+    private float echoWeight = 0;
 
     private RAIDAX raidax = RAIDAX.getInstance();
-    LinearLayout.LayoutParams layoutParams;
+    //LinearLayout.LayoutParams layoutParams;
     @Nullable
     public static String getInternalStorageDirectoryPath(Context context) {
         String storageDirectoryPath;
@@ -155,28 +159,17 @@ public class HomeFragment extends BaseFragment2 implements UDPCallBackInterface 
         progressDialog = new ProgressDialog(getBaseActivity());
         settingsList = DatabaseClient.getInstance(getActivity()).getAppDatabase()
                 .settingsDao().getAllStatus();
-        batteryProgressFill= view.findViewById(R.id.batteryProgressFill);
+
         tvTotalAmount = view.findViewById(R.id.home_fragment_tvPrice);
         tvVersion = view.findViewById(R.id.home_fragment_tvVerion);
         llDeposit = view.findViewById(R.id.home_fragment_llDeposit);
         llWithdraw = view.findViewById(R.id.home_fragment_llWithdraw);
         rvDenomination = view.findViewById(R.id.fragment_home_rvDenomination);
-        rvDenomination.setLayoutManager(new LinearLayoutManager(getActivity(),
-                LinearLayoutManager.HORIZONTAL, true));
+       // rvDenomination.setLayoutManager(new LinearLayoutManager(getActivity(),
+       //         LinearLayoutManager.HORIZONTAL, true));
         rvIndicator = view.findViewById(R.id.fragment_home_rvIndicator);
 
         llProgress = view.findViewById(R.id.fragment_home_llProgress);
-
-        linearLayout = view.findViewById(R.id.batteryProgressLayout);
-
-// Get the existing LinearLayout.LayoutParams for the view
-        try {
-            layoutParams = (LinearLayout.LayoutParams) linearLayout.getLayoutParams();
-        }
-        catch (Exception e) {
-            Log.e(RAIDAX.TAG, e.getMessage());
-            e.printStackTrace();
-        }
 
         int size = ScreeUtils.INSTANCE.getScreenWidth(getBaseActivity()) -
                 getResources().getDimensionPixelSize(R.dimen._220sdp);
@@ -267,9 +260,6 @@ public class HomeFragment extends BaseFragment2 implements UDPCallBackInterface 
         } catch (PackageManager.NameNotFoundException e) {
             e.printStackTrace();
         }
-        String ver = pkgInfo.versionName;
-        tvVersion.setText("" + ver);
-
     }
 
     private void takePermission() {
@@ -362,12 +352,19 @@ public class HomeFragment extends BaseFragment2 implements UDPCallBackInterface 
                             //Log.d(RAIDAX.TAG, "Coin  " + i++ + " : " + cc.getDenomination() + ". Serial :" + cc.getSerialAsInt() + ", Fraction: "+ total);
                         }
 
-                        DecimalFormat decimalFormat = new DecimalFormat("0.#####");
+                        DecimalFormat decimalFormat = new DecimalFormat("#####");
                         String stringValue = decimalFormat.format(total);
+
+                        int bitcoinBalance = (int) total;
+                        long satoshiBalance = (long) ((total - bitcoinBalance) * 1e8);
+
+                        String bitcoinBalanceText = String.format("%d", bitcoinBalance);
+                        String satoshiBalanceText = String.format("%08d", satoshiBalance);
+
                         Log.d(RAIDAX.TAG,"Total: "+ stringValue);
                         int bankCoins = CommonUtils.countFiles(CommonUtils.getFolderPath(getActivity(),"Bank"),".bin");
                         int frackedCoins = CommonUtils.countFiles(CommonUtils.getFolderPath(getActivity(),"Fracked"),".bin");
-                        tvTotalAmount.setText(stringValue);
+                        tvTotalAmount.setText(satoshiBalanceText);
                     }
                     catch (Exception e) {
                         Log.e("Error", e.getMessage());
@@ -1013,6 +1010,7 @@ public class HomeFragment extends BaseFragment2 implements UDPCallBackInterface 
         // hideProgressDialogWithTitle();
     }
 
+
     private void echo() {
         try {
             raidax.execute(CommandCodes.Echo);
@@ -1029,10 +1027,13 @@ public class HomeFragment extends BaseFragment2 implements UDPCallBackInterface 
             echoWeight = result.getPassCount()*100/ RAIDAX.NUM_SERVERS;
 
 // Set the weight for the view
-            layoutParams.weight = echoWeight;
+    //setBatteryPercentage(0.6f);
+
+            //layoutParams.weight = echoWeight;
 
 // Update the view's layout parameters
-            //batteryProgressFill.setLayoutParams(layoutParams);
+//            batteryProgressFill.setLayoutParams(layoutParams);
+//            batteryProgressEmpty.setLayoutParams(layoutParams2);
 
             rvIndicator.post(new Runnable() {
                 @SuppressLint("NotifyDataSetChanged")
