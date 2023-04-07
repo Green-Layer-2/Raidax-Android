@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/batteryProgressBarContainer"
+    android:background="@drawable/white_border"
+    android:layout_width="match_parent"
+    android:padding="@dimen/_2sdp"
+    android:layout_height="@dimen/_10sdp">
+
+    <LinearLayout
+        android:id="@+id/batteryProgressLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <View
+            android:id="@+id/batteryProgressFill"
+            android:layout_width="0dp"
+            android:layout_height="20dp"
+            android:background="@color/colorGreen"
+            android:layout_weight="0.8" />
+
+        <View
+            android:id="@+id/batteryProgressEmpty"
+            android:layout_width="0dp"
+            android:layout_height="20dp"
+            android:background="@color/transparent"
+            android:layout_weight="0.0" />
+
+    </LinearLayout>
+
+    <RelativeLayout
+        android:id="@+id/batteryProgressTextContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@+id/batteryProgressFill"
+        android:layout_alignBottom="@+id/batteryProgressFill">
+
+        <TextView
+            android:id="@+id/batteryProgressText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_alignParentTop="true"
+            android:fontFamily="@font/gotham_medium"
+            android:text="RAIDA"
+            android:textColor="@color/white"
+            android:textSize="14sp" />
+    </RelativeLayout>
+
+</RelativeLayout>

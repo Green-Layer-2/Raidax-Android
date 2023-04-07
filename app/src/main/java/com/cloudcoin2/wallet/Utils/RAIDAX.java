@@ -429,9 +429,9 @@ public class RAIDAX {
     public void processEchoResults(List<RaidaResponse> results) {
         EchoResult echoResult = new EchoResult(0, 0);
         echoResult.compute(results);
-        System.out.println("Got Total Results:" + echoResult.getResultCount());
+        //System.out.println("Got Total Results:" + echoResult.getResultCount());
         System.out.println("Got Pass Results:" + echoResult.getPassCount());
-        System.out.println("Got Fail Results:" + echoResult.getFailCount());
+        //System.out.println("Got Fail Results:" + echoResult.getFailCount());
         this.echoResult = echoResult;
     }
 

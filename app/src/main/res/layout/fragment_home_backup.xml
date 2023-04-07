@@ -21,19 +21,6 @@
             android:background="@android:color/transparent"
             tools:context=".ui.home.HomeFragment">
 
-            <include
-                android:id="@+id/batteryProgressFill"
-                layout="@layout/battery_progress_bar"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                android:layout_width="@dimen/_48sdp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/_8sdp"
-                android:layout_marginTop="@dimen/_20sdp"
-                android:padding="@dimen/_5sdp" />
-
-
-
             <!--app logo-->
             <ImageView
                 android:id="@+id/home_fragment_ivAppLogo"
@@ -41,15 +28,12 @@
                 android:layout_height="@dimen/_56sdp"
                 android:layout_marginTop="@dimen/_20sdp"
                 android:padding="@dimen/_5sdp"
-                android:visibility="gone"
                 android:src="@drawable/cloud_coin_logo"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
-
             <TextView
-                android:visibility="gone"
                 android:id="@+id/home_fragment_tvVerion"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -91,7 +75,6 @@
                 app:layout_constraintTop_toBottomOf="@+id/fragment_home_rvIndicator">
 
                 <ImageView
-                    android:visibility="gone"
                     android:id="@+id/fragment_withdraw_ivRaidaLogo"
                     android:layout_width="@dimen/_40sdp"
                     android:layout_height="wrap_content"
@@ -110,7 +93,7 @@
                 android:id="@+id/home_fragment_tvPrice"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/_88sdp"
+                android:layout_marginTop="44dp"
                 android:fontFamily="@font/gotham_medium"
                 android:text="0"
                 android:textColor="@color/white"
@@ -118,28 +101,6 @@
                 app:layout_constraintEnd_toEndOf="@+id/fragment_home_rvIndicator"
                 app:layout_constraintStart_toStartOf="@+id/fragment_home_rvIndicator"
                 app:layout_constraintTop_toBottomOf="@+id/fragment_home_rvIndicator" />
-            <TextView
-                android:id="@+id/home_fragment_avPrice"
-                android:text="@string/av_price"
-                android:fontFamily="@font/gotham_medium"
-                android:textColor="@color/colorGreyDark"
-                android:textSize="18sp"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/_10sdp"
-                app:layout_constraintStart_toStartOf="@+id/home_fragment_tvPrice"
-                app:layout_constraintEnd_toEndOf="@+id/home_fragment_tvPrice"
-                app:layout_constraintTop_toBottomOf="@+id/home_fragment_tvPrice" />
-            <ImageView
-                android:id="@+id/imgLogo"
-                android:layout_width="@dimen/_50sdp"
-                android:layout_height="@dimen/_50sdp"
-                android:src="@drawable/play_coin_icon"
-                android:layout_marginTop="@dimen/_40sdp"
-                app:layout_constraintStart_toStartOf="@+id/home_fragment_avPrice"
-                app:layout_constraintEnd_toEndOf="@+id/home_fragment_avPrice"
-                app:layout_constraintTop_toBottomOf="@+id/home_fragment_avPrice" />
-
 
             <ImageView
                 android:layout_width="@dimen/_20sdp"
@@ -192,13 +153,46 @@
                 android:layout_height="@dimen/_110sdp"
                 android:layout_margin="@dimen/_10sdp"
                 android:layout_marginBottom="12dp"
+                android:background="@drawable/design_box_background"
                 android:gravity="center"
                 android:orientation="vertical"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@+id/home_fragment_llDeposit"
                 app:layout_constraintHorizontal_bias="0.5"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/imgLogo">
+                app:layout_constraintStart_toStartOf="parent">
+
+                <ImageView
+                    android:layout_width="@dimen/_22sdp"
+                    android:layout_height="@dimen/_22sdp"
+                    android:src="@drawable/ic_circle_subtract" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/_10sdp"
+                    android:fontFamily="@font/gotham_medium"
+                    android:gravity="center"
+                    android:text="@string/label_withdraw"
+                    android:textAllCaps="true"
+                    android:textColor="@color/colorLightBlue"
+                    android:textSize="@dimen/_16sdp" />
+
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/home_fragment_llDeposit"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/_110sdp"
+                android:layout_margin="@dimen/_10sdp"
+                android:background="@drawable/design_box_background"
+                android:gravity="center"
+                android:orientation="vertical"
+                app:layout_constraintBottom_toBottomOf="@+id/home_fragment_llWithdraw"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toEndOf="@+id/home_fragment_llWithdraw"
+                app:layout_constraintTop_toTopOf="@+id/home_fragment_llWithdraw">
 
                 <ImageView
                     android:layout_width="@dimen/_22sdp"
@@ -213,40 +207,7 @@
                     android:gravity="center"
                     android:text="@string/label_deposit"
                     android:textAllCaps="true"
-                    android:textColor="@color/white"
-                    android:textSize="@dimen/_16sdp" />
-
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/home_fragment_llDeposit"
-                android:layout_width="0dp"
-                android:layout_height="@dimen/_110sdp"
-                android:layout_margin="@dimen/_10sdp"
-                android:gravity="center"
-                android:orientation="vertical"
-                app:layout_constraintBottom_toBottomOf="@+id/home_fragment_llWithdraw"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.5"
-                app:layout_constraintStart_toEndOf="@+id/home_fragment_llWithdraw"
-                app:layout_constraintTop_toTopOf="@+id/home_fragment_llWithdraw">
-
-
-            <ImageView
-                    android:layout_width="@dimen/_22sdp"
-                    android:layout_height="@dimen/_22sdp"
-                    android:src="@drawable/ic_circle_subtract" />
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/_10sdp"
-                    android:fontFamily="@font/gotham_medium"
-                    android:gravity="center"
-                    android:text="@string/label_withdraw"
-                    android:textAllCaps="true"
-                    android:textColor="@color/white"
+                    android:textColor="@color/colorLightBlue"
                     android:textSize="@dimen/_16sdp" />
 
             </LinearLayout>

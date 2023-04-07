@@ -19,6 +19,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -96,10 +97,12 @@ public class HomeFragment extends BaseFragment2 implements UDPCallBackInterface 
     boolean isStartupTaskCompleted = false;
     Handler mhandler;
     List<Settings> settingsList;
+    private View batteryProgressFill;
     private TextView tvTotalAmount, tvVersion;
     private LinearLayout llDeposit, llWithdraw;
     private List<SavedCoin> mCoinCount = new ArrayList<>();
     private RecyclerView rvDenomination;
+    LinearLayout linearLayout;
     private String bankDirPath, limboDirPath, counterfeitPath, importPath, frackedDirPath, trashPath, mIDPath, exportPath;
     private IndicatorAdapter mAdapter;
     private ArrayList<Uri> coinsToDelete = new ArrayList<>();
@@ -114,7 +117,11 @@ public class HomeFragment extends BaseFragment2 implements UDPCallBackInterface 
     private int totalApiResponseCount = 0, totalApiRequestCount = 0;
     private int echoCount = 0, echoPassCount = 0;
     private int mResponseCount = 0;
+
+    private int echoWeight = 0;
+
     private RAIDAX raidax = RAIDAX.getInstance();
+    LinearLayout.LayoutParams layoutParams;
     @Nullable
     public static String getInternalStorageDirectoryPath(Context context) {
         String storageDirectoryPath;
@@ -148,6 +155,7 @@ public class HomeFragment extends BaseFragment2 implements UDPCallBackInterface 
         progressDialog = new ProgressDialog(getBaseActivity());
         settingsList = DatabaseClient.getInstance(getActivity()).getAppDatabase()
                 .settingsDao().getAllStatus();
+        batteryProgressFill= view.findViewById(R.id.batteryProgressFill);
         tvTotalAmount = view.findViewById(R.id.home_fragment_tvPrice);
         tvVersion = view.findViewById(R.id.home_fragment_tvVerion);
         llDeposit = view.findViewById(R.id.home_fragment_llDeposit);
@@ -158,6 +166,18 @@ public class HomeFragment extends BaseFragment2 implements UDPCallBackInterface 
         rvIndicator = view.findViewById(R.id.fragment_home_rvIndicator);
 
         llProgress = view.findViewById(R.id.fragment_home_llProgress);
+
+        linearLayout = view.findViewById(R.id.batteryProgressLayout);
+
+// Get the existing LinearLayout.LayoutParams for the view
+        try {
+            layoutParams = (LinearLayout.LayoutParams) linearLayout.getLayoutParams();
+        }
+        catch (Exception e) {
+            Log.e(RAIDAX.TAG, e.getMessage());
+            e.printStackTrace();
+        }
+
         int size = ScreeUtils.INSTANCE.getScreenWidth(getBaseActivity()) -
                 getResources().getDimensionPixelSize(R.dimen._220sdp);
         int itemWidth = (size / 25);
@@ -1005,6 +1025,14 @@ public class HomeFragment extends BaseFragment2 implements UDPCallBackInterface 
                 mAdapter.replaceData(new EchoStatus(i,status),i);
                 i++;
             }
+
+            echoWeight = result.getPassCount()*100/ RAIDAX.NUM_SERVERS;
+
+// Set the weight for the view
+            layoutParams.weight = echoWeight;
+
+// Update the view's layout parameters
+            //batteryProgressFill.setLayoutParams(layoutParams);
 
             rvIndicator.post(new Runnable() {
                 @SuppressLint("NotifyDataSetChanged")

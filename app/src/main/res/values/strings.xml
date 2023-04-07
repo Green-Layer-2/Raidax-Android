@@ -2,8 +2,9 @@
     <string name="app_name">PlayCoin</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
-    <string name="label_withdraw">Withdraw</string>
-    <string name="label_deposit">Deposit</string>
+    <string name="label_withdraw">EXPORT</string>
+    <string name="label_deposit">IMPORT</string>
+    <string name="av_price">AVAILABLE BALANCE</string>
     <string name="label_max_skywallet_cc">max.skywallet.cc</string>
     <string name="label_01_21">01/21</string>
     <string name="label_sky_wallet_address">Sky Wallet Address</string>

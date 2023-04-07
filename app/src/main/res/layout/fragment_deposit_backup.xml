@@ -1,0 +1,238 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+    </data>
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/constraint"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/background"
+        android:paddingHorizontal="@dimen/_10sdp">
+        <!--Header container-->
+        <RelativeLayout
+            android:id="@+id/fragment_wallet_rlHeader"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/_30sdp"
+            android:orientation="horizontal"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <!--Back arrow-->
+            <ImageView
+                android:id="@+id/fragment_deposit_ivBack"
+                android:layout_width="@dimen/_25sdp"
+                android:layout_height="@dimen/_25sdp"
+                android:layout_centerVertical="true"
+                android:padding="@dimen/_4sdp"
+                android:src="@drawable/ic_back"
+                app:tint="@color/white" />
+
+
+        </RelativeLayout>
+
+
+        <!--view container-->
+        <!-- <androidx.core.widget.NestedScrollView
+             android:layout_width="0dp"
+             android:layout_height="0dp"
+             app:layout_constraintBottom_toBottomOf="parent"
+             app:layout_constraintEnd_toEndOf="parent"
+             app:layout_constraintStart_toStartOf="parent"
+             app:layout_constraintTop_toBottomOf="@+id/fragment_wallet_rlHeader">-->
+
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/fragment_wallet_rlHeader"
+            tools:layout_editor_absoluteX="13dp">
+
+            <!--Network strip layout container-->
+            <RelativeLayout
+                android:id="@+id/fragment_wallet_rlNetworkStrip"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/_10sdp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <!--<androidx.recyclerview.widget.RecyclerView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />-->
+
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/fragment_deposit_rvIndicator"
+                    android:layout_width="wrap_content"
+                    android:layout_height="@dimen/_20sdp"
+                    android:layout_centerInParent="true"
+                    android:nestedScrollingEnabled="false"
+                    android:orientation="horizontal"
+                    android:overScrollMode="never"
+                    android:scrollbars="none"
+                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                    tools:listitem="@layout/item_indicator" />
+
+
+
+                <!--&lt;!&ndash;Network Strip&ndash;&gt;
+                <ImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_centerVertical="true"
+                    android:background="@drawable/network_strip"
+                    android:visibility="gone"
+                    app:tint="@color/white" />-->
+
+
+            </RelativeLayout>
+
+            <LinearLayout
+                android:id="@+id/imagset"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/_10sdp"
+                android:orientation="horizontal"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentBottom="true"
+                app:layout_constraintEnd_toEndOf="@+id/fragment_wallet_rlNetworkStrip"
+                app:layout_constraintTop_toBottomOf="@+id/fragment_wallet_rlNetworkStrip">
+
+                <!--Raida logo-->
+                <ImageView
+                    android:id="@+id/fragment_deposit_raida"
+                    android:layout_width="@dimen/_40sdp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="8dp"
+                    android:src="@drawable/ic_raida"
+                    app:layout_constraintEnd_toStartOf="parent"
+                    />
+
+            </LinearLayout>
+
+
+
+            <TextView
+                android:id="@+id/textView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:fontFamily="@font/gotham_bold"
+                android:gravity="center|bottom"
+                android:text="@string/label_deposit"
+                android:textColor="@color/white"
+                android:textSize="20sp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/fragment_wallet_rlNetworkStrip" />
+
+
+
+
+            <LinearLayout
+                android:id="@+id/linearLayout5"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/_10sdp"
+                android:orientation="vertical"
+                app:layout_constraintTop_toBottomOf="@+id/textView">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/gotham_bold"
+                    android:text="Add Funds"
+                    android:textColor="@color/white"
+                    android:textSize="16sp" />
+
+                <EditText
+                    android:id="@+id/txtLockerCode"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/_50sdp"
+                    android:layout_marginTop="@dimen/_5sdp"
+                    android:background="@drawable/design_box_background"
+                    android:fontFamily="@font/gotham_book"
+                    android:gravity="center_vertical"
+                    android:hint="Enter Code"
+                    android:maxLines="1"
+                    android:imeOptions="actionDone"
+                    android:singleLine="true"
+                    android:text="9H9-XF64"
+                    android:paddingStart="@dimen/_25sdp"
+                    android:textColor="@color/colorLightGrayishBlue"
+                    android:textColorHint="@color/colorLightGrayishBlue"
+                    android:textSize="17sp" />
+
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/fragment_deposit_tvDeposit"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/_50sdp"
+                android:layout_marginTop="@dimen/_15sdp"
+                android:layout_weight="1"
+                android:background="@drawable/design_button_background"
+                android:fontFamily="@font/gotham_medium"
+                android:gravity="center"
+                android:text="Submit Code"
+                android:textAllCaps="true"
+                android:textColor="@color/white"
+                android:textSize="18sp"
+                app:layout_constraintTop_toBottomOf="@+id/linearLayout5"
+                tools:layout_editor_absoluteX="13dp" />
+
+            <TextView
+                android:id="@+id/fragment_deposit_tvCancel"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/_50sdp"
+                android:layout_marginTop="@dimen/_15sdp"
+                android:layout_weight="1"
+                android:visibility="gone"
+                android:background="@drawable/design_box_transparent_white"
+                android:fontFamily="@font/gotham_medium"
+                android:gravity="center"
+                android:text="Cancel"
+                android:textAllCaps="true"
+                android:textColor="@color/white"
+                android:textSize="18sp"
+                app:layout_constraintTop_toBottomOf="@+id/fragment_deposit_tvDeposit"
+                tools:layout_editor_absoluteX="13dp" />
+            <TextView
+                android:layout_marginTop="@dimen/_8sdp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/gotham_light"
+                android:text="@string/deposit_text"
+                app:layout_constraintTop_toBottomOf="@+id/fragment_deposit_tvCancel"
+
+                android:textColor="@color/white"
+                android:textSize="16sp" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <LinearLayout
+            android:id="@+id/fragment_deposit_llProgress"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/colorBlackOverlay">
+
+            <ProgressBar
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:progressTint="@color/colorLightBlue"
+                android:indeterminate="true"/>
+        </LinearLayout>
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

@@ -36,7 +36,7 @@ public class CommonUtils {
         try {
             File idPathFile = new File(idPath);
             idPathFile.mkdirs();
-            Log.d("path created",idPath);
+            //Log.d("path created",idPath);
         } catch (Exception e) {
             Log.e("TAG", "Can not create Import directory");
             return null;
