@@ -71,30 +71,9 @@
             android:layout_height="match_parent" />-->
 
 
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/fragment_deposit_rvIndicator"
-                android:layout_width="wrap_content"
-                android:layout_height="@dimen/_20sdp"
-                android:layout_centerInParent="true"
-                android:nestedScrollingEnabled="false"
-                android:orientation="horizontal"
-                android:overScrollMode="never"
-                android:scrollbars="none"
-                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-                tools:listitem="@layout/item_indicator" />
-
-
-
-            <!--&lt;!&ndash;Network Strip&ndash;&gt;
-            <ImageView
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_centerVertical="true"
-                android:background="@drawable/network_strip"
-                android:visibility="gone"
-                app:tint="@color/white" />-->
-
-
+            <include
+                layout="@layout/raida_deposit"
+                android:id="@+id/include_recyclerview_raida"/>
         </RelativeLayout>
 
         <LinearLayout
@@ -107,17 +86,6 @@
             android:layout_alignParentBottom="true"
             app:layout_constraintEnd_toEndOf="@+id/fragment_wallet_rlNetworkStrip"
             app:layout_constraintTop_toBottomOf="@+id/fragment_wallet_rlNetworkStrip">
-
-        <!--Raida logo-->
-        <ImageView
-            android:id="@+id/fragment_deposit_raida"
-            android:layout_width="@dimen/_40sdp"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="8dp"
-            android:src="@drawable/ic_raida"
-            app:layout_constraintEnd_toStartOf="parent"
-            />
-
         </LinearLayout>
 
 

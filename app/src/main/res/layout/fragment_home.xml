@@ -10,18 +10,6 @@
             android:layout_height="wrap_content"
             android:background="@android:color/transparent"
             tools:context=".ui.home.HomeFragment">
-            <ImageView
-                android:id="@+id/home_fragment_ivAppLogo"
-                android:layout_width="@dimen/_101sdp"
-                android:layout_height="@dimen/_56sdp"
-                android:layout_marginTop="@dimen/_20sdp"
-                android:padding="@dimen/_5sdp"
-                android:visibility="gone"
-                android:src="@drawable/cloud_coin_logo"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-
             <androidx.recyclerview.widget.RecyclerView
                 android:background="@drawable/white_border"
                 android:id="@+id/fragment_home_rvIndicator"
@@ -49,8 +37,6 @@
                 app:layout_constraintEnd_toEndOf="@+id/fragment_home_rvIndicator"
                 app:layout_constraintTop_toTopOf="@+id/fragment_home_rvIndicator"
                 app:layout_constraintBottom_toBottomOf="@+id/fragment_home_rvIndicator" />
-            <!-- other views -->
-
             <TextView
                 android:id="@+id/home_fragment_tvCoins"
                 android:layout_width="wrap_content"
@@ -63,15 +49,15 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/fragment_home_rvIndicator" />
-
             <TextView
                 android:id="@+id/home_fragment_tvPrice"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/gotham_medium"
                 android:text="0"
+                android:layout_marginBottom="@dimen/_25sdp"
                 android:textColor="@color/white"
-                android:textSize="25sp"
+                android:textSize="20sp"
                 app:layout_constraintStart_toEndOf="@+id/home_fragment_tvCoins"
                 app:layout_constraintTop_toTopOf="@+id/home_fragment_tvCoins"
                 app:layout_constraintBottom_toBottomOf="@+id/home_fragment_tvCoins" />
@@ -85,7 +71,7 @@
                 android:textSize="18sp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/_10sdp"
+                android:layout_marginTop="@dimen/_35sdp"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/home_fragment_tvPrice" />
@@ -174,8 +160,6 @@
                     android:textColor="@color/white"
                     android:textSize="@dimen/_16sdp" />
             </LinearLayout>
-
         </androidx.constraintlayout.widget.ConstraintLayout>
-
     </ScrollView>
 </layout>
