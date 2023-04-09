@@ -145,7 +145,7 @@ public class DepositFragment extends BaseFragment2 implements View.OnClickListen
 
     @Override
     protected int defineLayoutResource() {
-        return R.layout.fragment_deposit;
+        return R.layout.fragment_funds;
     }
 
     @Override
@@ -156,7 +156,6 @@ public class DepositFragment extends BaseFragment2 implements View.OnClickListen
         txtLockerCode = view.findViewById(R.id.txtLockerCode);
         tvDeposit.setOnClickListener(this);
         tvCancel = view.findViewById(R.id.fragment_deposit_tvCancel);
-        tvCancel.setOnClickListener(this);
         databaseHelper = new DatabaseHelper(getActivity());
         llProgress = view.findViewById(R.id.fragment_deposit_llProgress);
         llProgress.setVisibility(View.GONE);

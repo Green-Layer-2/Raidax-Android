@@ -1,11 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
-
-    <data>
-</data>
 <androidx.constraintlayout.widget.ConstraintLayout
     android:id="@+id/constraint"
     android:layout_width="match_parent"
@@ -35,17 +31,6 @@
 
     </RelativeLayout>
 
-
-    <!--view container-->
-    <!-- <androidx.core.widget.NestedScrollView
-         android:layout_width="0dp"
-         android:layout_height="0dp"
-         app:layout_constraintBottom_toBottomOf="parent"
-         app:layout_constraintEnd_toEndOf="parent"
-         app:layout_constraintStart_toStartOf="parent"
-         app:layout_constraintTop_toBottomOf="@+id/fragment_wallet_rlHeader">-->
-
-
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="0dp"
         android:layout_height="0dp"
@@ -65,15 +50,35 @@
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
 
-            <!--<androidx.recyclerview.widget.RecyclerView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" />-->
-
-
-            <include
-                layout="@layout/raida_deposit"
-                android:id="@+id/include_recyclerview_raida"/>
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/fragment_deposit_rvIndicator"
+                    android:layout_width="@dimen/_48sdp"
+                    android:layout_height="@dimen/_20sdp"
+                    android:nestedScrollingEnabled="false"
+                    android:padding="@dimen/_2sdp"
+                    android:background="@drawable/white_border"
+                    android:orientation="horizontal"
+                    android:overScrollMode="never"
+                    android:scrollbars="none"
+                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"/>
+                <TextView
+                    android:id="@+id/tvRaida"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="RAIDA"
+                    android:textColor="@color/white"
+                    android:textSize="12sp"
+                    app:layout_constraintStart_toStartOf="@+id/fragment_deposit_rvIndicator"
+                    app:layout_constraintTop_toTopOf="@+id/fragment_deposit_rvIndicator"
+                    android:layout_marginStart="@dimen/_10sdp"
+                    android:layout_marginTop="@dimen/_5sdp"/>
+            </androidx.constraintlayout.widget.ConstraintLayout>
         </RelativeLayout>
 
         <LinearLayout
@@ -87,9 +92,6 @@
             app:layout_constraintEnd_toEndOf="@+id/fragment_wallet_rlNetworkStrip"
             app:layout_constraintTop_toBottomOf="@+id/fragment_wallet_rlNetworkStrip">
         </LinearLayout>
-
-
-
         <TextView
             android:id="@+id/textView"
             android:layout_width="wrap_content"
@@ -102,10 +104,6 @@
             android:textSize="20sp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/fragment_wallet_rlNetworkStrip" />
-
-
-
-
         <LinearLayout
             android:id="@+id/linearLayout5"
             android:layout_width="match_parent"
@@ -113,7 +111,6 @@
             android:layout_marginTop="@dimen/_10sdp"
             android:orientation="vertical"
             app:layout_constraintTop_toBottomOf="@+id/textView">
-
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -181,7 +178,6 @@
             android:fontFamily="@font/gotham_light"
             android:text="@string/deposit_text"
             app:layout_constraintTop_toBottomOf="@+id/fragment_deposit_tvCancel"
-
             android:textColor="@color/white"
             android:textSize="16sp" />
 

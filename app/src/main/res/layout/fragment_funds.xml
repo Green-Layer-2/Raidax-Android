@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/constraint"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/background"
+        android:paddingHorizontal="@dimen/_10sdp">
+        <!--Header container-->
+        <RelativeLayout
+            android:id="@+id/fragment_wallet_rlHeader"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/_30sdp"
+            android:orientation="horizontal"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <!--Back arrow-->
+            <ImageView
+                android:id="@+id/fragment_deposit_ivBack"
+                android:layout_width="@dimen/_25sdp"
+                android:layout_height="@dimen/_25sdp"
+                android:layout_centerVertical="true"
+                android:padding="@dimen/_4sdp"
+                android:src="@drawable/ic_back"
+                app:tint="@color/white" />
+
+
+        </RelativeLayout>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/fragment_wallet_rlHeader"
+            tools:layout_editor_absoluteX="13dp">
+
+            <!--Network strip layout container-->
+            <RelativeLayout
+                android:id="@+id/fragment_wallet_rlNetworkStrip"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/_10sdp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+                <include
+                    layout="@layout/raida_deposit"
+                    android:id="@+id/include_recyclerview_raida"/>
+            </RelativeLayout>
+            <ImageView
+                android:id="@+id/image_above_add_funds"
+                android:layout_width="@dimen/_50sdp"
+                android:layout_height="@dimen/_50sdp"
+                android:src="@drawable/play_coin_icon"
+                android:layout_marginTop="@dimen/_32sdp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/fragment_wallet_rlNetworkStrip" />
+
+            <LinearLayout
+                android:paddingLeft="@dimen/_30sdp"
+                android:paddingRight="@dimen/_30sdp"
+                android:id="@+id/linearLayout5"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/_20sdp"
+                android:orientation="vertical"
+                app:layout_constraintTop_toBottomOf="@+id/image_above_add_funds">
+                <TextView
+                    android:visibility="gone"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/gotham_bold"
+                    android:text="Add Funds"
+                    android:textColor="@color/white"
+                    android:textSize="16sp" />
+
+                <EditText
+                    android:id="@+id/txtLockerCode"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/_30sdp"
+                    android:layout_marginTop="@dimen/_5sdp"
+                    android:background="@drawable/design_box_background"
+                    android:fontFamily="@font/gotham_book"
+                    android:gravity="center_vertical"
+                    android:hint="Enter Code"
+                    android:maxLines="1"
+                    android:imeOptions="actionDone"
+                    android:singleLine="true"
+                    android:text="9H9-XF64"
+                    android:paddingStart="@dimen/_25sdp"
+                    android:textColor="@color/white"
+                    android:textColorHint="@color/colorLightGrayishBlue"
+                    android:textSize="17sp" />
+
+                <TextView
+                    android:id="@+id/fragment_deposit_tvDeposit"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/_40sdp"
+                    android:layout_marginTop="@dimen/_15sdp"
+                    android:layout_weight="1"
+                    android:background="@drawable/design_button_background"
+                    android:fontFamily="@font/gotham_medium"
+                    android:gravity="center"
+                    android:text="Add Funds"
+                    android:textAllCaps="true"
+                    android:textColor="@color/white"
+                    android:textSize="18sp"
+                    tools:layout_editor_absoluteX="13dp" />
+
+                <EditText
+                    android:id="@+id/txtLockerCodeRemove"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/_30sdp"
+                    android:layout_marginTop="@dimen/_25sdp"
+                    android:background="@drawable/design_box_background"
+                    android:fontFamily="@font/gotham_book"
+                    android:gravity="center_vertical"
+                    android:hint="Enter Code"
+                    android:maxLines="1"
+                    android:imeOptions="actionDone"
+                    android:singleLine="true"
+                    android:text="9H9-XF64"
+                    android:paddingStart="@dimen/_25sdp"
+                    android:textColor="@color/white"
+                    android:textColorHint="@color/colorLightGrayishBlue"
+                    android:textSize="17sp" />
+
+                <TextView
+                    android:id="@+id/fragment_remove_tvRemove"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/_40sdp"
+                    android:layout_marginTop="@dimen/_15sdp"
+                    android:layout_weight="1"
+                    android:background="@drawable/design_button_background"
+                    android:fontFamily="@font/gotham_medium"
+                    android:gravity="center"
+                    android:text="Remove Funds"
+                    android:textAllCaps="true"
+                    android:textColor="@color/white"
+                    android:textSize="18sp"
+                    tools:layout_editor_absoluteX="13dp" />
+
+            </LinearLayout>
+
+
+            <TextView
+                android:id="@+id/fragment_deposit_tvCancel"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/_50sdp"
+                android:layout_marginTop="@dimen/_15sdp"
+                android:layout_weight="1"
+                android:visibility="gone"
+                android:background="@drawable/design_box_transparent_white"
+                android:fontFamily="@font/gotham_medium"
+                android:gravity="center"
+                android:text="Cancel"
+                android:textAllCaps="true"
+                android:textColor="@color/white"
+                android:textSize="18sp"
+                app:layout_constraintTop_toBottomOf="@+id/fragment_deposit_tvDeposit"
+                tools:layout_editor_absoluteX="13dp" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <LinearLayout
+            android:id="@+id/fragment_deposit_llProgress"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/colorBlackOverlay">
+
+            <ProgressBar
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:progressTint="@color/colorLightBlue"
+                android:indeterminate="true"/>
+        </LinearLayout>
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>
