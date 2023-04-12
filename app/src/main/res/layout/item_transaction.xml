@@ -3,25 +3,14 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <data>
-
-    </data>
-
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="@dimen/_60sdp"
-        android:background="@android:color/transparent">
+        android:padding="@dimen/_8sdp"
+        android:layout_marginTop="@dimen/_20sdp"
+        android:background="@drawable/gray_box"
+        >
 
-        <!--image pointer-->
-        <ImageView
-            android:id="@+id/item_transaction_ivPointer"
-            android:layout_width="@dimen/_15sdp"
-            android:layout_height="@dimen/_8sdp"
-            android:layout_marginStart="8dp"
-            android:src="@drawable/ic_green_up"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
 
         <!--item status-->
         <TextView
@@ -57,7 +46,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/_2sdp"
                 android:text="JAN 16 `20 8.40AM"
-                android:textColor="@color/colorDarkBlue"
+                android:textColor="#88888A"
                 android:textSize="12sp" />
 
         </LinearLayout>

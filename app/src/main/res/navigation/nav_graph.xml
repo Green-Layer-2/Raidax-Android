@@ -10,7 +10,7 @@
         android:label="HomeFragment" />
     <fragment
         android:id="@+id/transactionFragment"
-        android:name="com.cloudcoin2.wallet.transaction.TransactionFragment"
+        android:name="com.cloudcoin2.wallet.transaction.TransactionsFragment"
         android:label="TransactionFragment" />
     <fragment
         android:id="@+id/SettingsFragment"
